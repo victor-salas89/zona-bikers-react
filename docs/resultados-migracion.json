@@ -1,0 +1,89 @@
+{
+  "fechaUTC": "2026-10-23T06:48:27.694Z",
+  "zonaHoraria": "America/Santiago",
+  "herramienta": "Vitest",
+  "versiones": {
+    "vitest": "5.0.5",
+    "playwright": "1.64.1",
+    "node": "v24.19.0",
+    "chromium": "156.0.8078.4"
+  },
+  "entorno": {
+    "frontend": "Chromium headless de Playwright",
+    "servidor": "Node.js"
+  },
+  "casos": {
+    "frontend": 142,
+    "servidor": 6
+  },
+  "casosOriginalesConservados": {
+    "frontend": 120,
+    "servidor": 6
+  },
+  "cobertura": {
+    "frontend": {
+      "lines": {
+        "total": 542,
+        "covered": 536,
+        "skipped": 0,
+        "pct": 98.89
+      },
+      "statements": {
+        "total": 674,
+        "covered": 664,
+        "skipped": 0,
+        "pct": 98.51
+      },
+      "functions": {
+        "total": 188,
+        "covered": 187,
+        "skipped": 0,
+        "pct": 99.46
+      },
+      "branches": {
+        "total": 464,
+        "covered": 449,
+        "skipped": 0,
+        "pct": 96.76
+      },
+      "branchesTrue": {
+        "total": 0,
+        "covered": 0,
+        "skipped": 0,
+        "pct": 100
+      }
+    },
+    "servidor": {
+      "lines": {
+        "total": 53,
+        "covered": 50,
+        "skipped": 0,
+        "pct": 94.33
+      },
+      "statements": {
+        "total": 76,
+        "covered": 61,
+        "skipped": 0,
+        "pct": 80.26
+      },
+      "functions": {
+        "total": 14,
+        "covered": 14,
+        "skipped": 0,
+        "pct": 100
+      },
+      "branches": {
+        "total": 60,
+        "covered": 47,
+        "skipped": 0,
+        "pct": 78.33
+      },
+      "branchesTrue": {
+        "total": 0,
+        "covered": 0,
+        "skipped": 0,
+        "pct": "Unknown"
+      }
+    }
+  }
+}

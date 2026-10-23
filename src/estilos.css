@@ -1,0 +1,162 @@
+﻿:root {
+    --biker-negro: #080808;
+    --biker-negro-suave: #181818;
+    --biker-naranja: #ff7a1a;
+    --biker-naranja-oscuro: #a84100;
+    --biker-blanco: #f6f6f6;
+    --bs-body-bg: #080808;
+    --bs-body-color: #f6f6f6;
+    --bs-secondary-color: #b5b5b5;
+    --bs-border-color: #363636;
+    --bs-link-color: #ff7a1a;
+    --bs-link-hover-color: #ffa35c;
+}
+
+body {
+    margin: 0;
+    background: var(--biker-negro);
+    color: var(--biker-blanco);
+    font-family: "Segoe UI", Roboto, Arial, sans-serif;
+    line-height: 1.65;
+    -webkit-font-smoothing: antialiased;
+}
+
+#root { min-height: 100vh; display: flex; flex-direction: column; }
+main { flex: 1; padding-top: 1.5rem; padding-bottom: 2rem; }
+h1, h2, h3 { font-weight: 750; letter-spacing: -0.035em; line-height: 1.15; }
+h1, h2, .precio { color: var(--biker-naranja); }
+h1 { font-size: clamp(2rem, 5vw, 3.25rem); margin-bottom: 1.25rem; }
+section > p { margin-bottom: 2rem; }
+a { text-underline-offset: 4px; }
+a:focus-visible, button:focus-visible { outline: 3px solid var(--biker-naranja); outline-offset: 4px; }
+
+/* Navegación y marca */
+.navbar-biker { background: #080808; border-bottom: 1px solid #292929; padding-block: 1rem; }
+.navbar-biker .navbar-brand { display: flex; align-items: center; gap: .7rem; color: var(--biker-naranja); font-weight: 800; letter-spacing: .04em; text-transform: uppercase; }
+.brand-logo { width: 46px; height: 46px; object-fit: contain; border-radius: 50%; }
+.navbar-biker .nav-link { color: #eee; font-weight: 500; margin-left: .25rem; border-radius: .5rem; }
+.navbar-biker .nav-link:hover, .navbar-biker .nav-link.active { color: var(--biker-naranja); background: #19130e; }
+.navbar-biker .navbar-toggler { border-color: #555; }
+.navbar-biker .navbar-nav { gap: .25rem; align-items: center; }
+
+/* Portada */
+.hero-biker { display: flex; align-items: center; justify-content: space-between; gap: 3rem; background: #080808; padding: 4rem 0 5rem; margin-bottom: 3.5rem; border-bottom: 1px solid #292929; }
+.hero-copy { max-width: 650px; }
+.hero-eyebrow { color: var(--biker-naranja); font-size: .75rem; font-weight: 700; letter-spacing: .2em; text-transform: uppercase; margin-bottom: 1.5rem; }
+.hero-biker h1 { font-size: clamp(3rem, 7vw, 6rem); font-weight: 900; text-transform: uppercase; letter-spacing: -.06em; line-height: 1; }
+.hero-biker .lead { color: #c0c0c0; max-width: 480px; margin-block: 1.5rem 2rem; }
+.hero-logo { width: 280px; max-width: 35%; height: auto; object-fit: contain; border-radius: 1.25rem; }
+.hero-biker .btn span { margin-left: 1.5rem; }
+.page-header { background: #080808; color: #fff; padding: 2rem 0; margin-bottom: 2rem; }
+
+/* Tarjetas claras con colores propios para conservar el contraste */
+.card { --bs-card-bg: #f6f6f6; --bs-card-color: #272727; --bs-secondary-color: #626262; --bs-border-color: #d5d5d5; --bs-link-color: #a84100; --bs-link-hover-color: #783000; color: #272727; }
+.card-biker { border: 1px solid #e3e3e3; border-radius: 1rem; box-shadow: 0 8px 28px #0003; transition: transform .2s ease, box-shadow .2s ease; height: 100%; }
+.card-biker:has(a, button):hover { transform: translateY(-4px); box-shadow: 0 12px 32px #0006; }
+.card-biker img, .card-img-biker { height: 220px; object-fit: cover; border-top-left-radius: 1rem; border-top-right-radius: 1rem; }
+.card-biker .card-body { padding: 1.5rem; }
+.card h1, .card h2, .card h3, .card-title { color: #181818; }
+.card-biker .card-title { font-weight: 750; }
+.card .precio { color: var(--biker-naranja-oscuro); font-weight: 800; font-size: 1.2rem; }
+
+/* Acciones principales: texto oscuro sobre naranja para mayor legibilidad */
+.btn { border-radius: .6rem; padding: .65rem 1.15rem; font-weight: 650; }
+.btn-sm { padding: .45rem .8rem; }
+.btn-primary, .btn-biker {
+    --bs-btn-color: #17100b; --bs-btn-bg: #ff7a1a; --bs-btn-border-color: #ff7a1a;
+    --bs-btn-hover-color: #17100b; --bs-btn-hover-bg: #ff943d; --bs-btn-hover-border-color: #ff943d;
+    --bs-btn-active-color: #17100b; --bs-btn-active-bg: #ff943d; --bs-btn-active-border-color: #ff943d;
+    --bs-btn-disabled-color: #17100b; --bs-btn-disabled-bg: #ff7a1a; --bs-btn-disabled-border-color: #ff7a1a;
+    --bs-btn-focus-shadow-rgb: 255, 122, 26;
+}
+.btn-outline-secondary { --bs-btn-color: #d0d0d0; --bs-btn-border-color: #666; --bs-btn-hover-bg: #303030; --bs-btn-hover-border-color: #888; }
+.card .btn-outline-secondary { --bs-btn-color: #444; --bs-btn-border-color: #aaa; }
+.btn-outline-biker { color: var(--biker-naranja); border-color: var(--biker-naranja); }
+.card .btn-outline-biker { color: var(--biker-naranja-oscuro); }
+.btn-outline-biker:hover { background: var(--biker-naranja); color: #17100b; }
+
+/* Campos tanto en páginas negras como en tarjetas claras */
+.form-label, .form-biker label { font-weight: 600; color: inherit; }
+.form-control, .form-select { background-color: #181818; color: #f6f6f6; border-color: #555; border-radius: .6rem; padding: .7rem .9rem; }
+.form-control::placeholder { color: #aaa; }
+.form-control:focus, .form-select:focus { background-color: #181818; color: #fff; border-color: var(--biker-naranja); box-shadow: 0 0 0 .2rem #ff7a1a33; }
+.card .form-control, .card .form-select { background-color: #fff; color: #222; border-color: #aaa; }
+.card .form-control::placeholder { color: #666; }
+.form-select { --bs-form-select-bg-img: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='%23aaaaaa' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='m2 5 6 6 6-6'/%3e%3c/svg%3e"); }
+.invalid-feedback { color: #ff8b95; }
+.card .invalid-feedback { color: #b02a37; }
+.form-biker .invalid-feedback { display: block; }
+.resumen-carrito { background: #181818; color: #fff; border: 1px solid #363636; border-radius: 1rem; padding: 1.5rem; }
+.resumen-carrito #totalCarrito { color: var(--biker-naranja); font-weight: 700; font-size: 1.3rem; }
+.navbar-admin { background: #080808; border-bottom: 1px solid var(--biker-naranja); }
+.navbar-admin .navbar-brand, .navbar-admin h2 { color: var(--biker-naranja); }
+.navbar-admin .nav-link { color: #fff; }
+.navbar-admin .nav-link:hover { color: var(--biker-naranja); }
+.table { --bs-table-bg: #080808; --bs-table-color: #eee; --bs-table-striped-bg: #181818; --bs-table-striped-color: #eee; --bs-table-hover-bg: #242424; --bs-table-hover-color: #fff; --bs-table-border-color: #363636; }
+.table thead { color: var(--biker-naranja); }
+.footer-biker { background: #080808; color: #aaa; text-align: center; padding: 2rem 0; margin-top: 3rem; border-top: 1px solid #292929; }
+.footer-biker p { margin: 0; font-size: .9rem; letter-spacing: .06em; }
+
+/* Asistente de motocicletas */
+.ia-flotante { position: fixed; right: calc(1.25rem + env(safe-area-inset-right, 0px)); bottom: calc(5.75rem + env(safe-area-inset-bottom, 0px)); z-index: 1030; min-height: 48px; padding: .65rem 1rem; border: 1px solid #ff7a1a; border-radius: 999px; background: #ff7a1a; color: #17100b; font-weight: 750; box-shadow: 0 6px 24px #0006; }
+.ia-flotante:hover { background: #ff943d; }
+.chat-biker { position: fixed; right: calc(1.25rem + env(safe-area-inset-right, 0px)); bottom: calc(9.5rem + env(safe-area-inset-bottom, 0px)); width: min(390px, calc(100vw - 2.5rem)); max-height: calc(100dvh - 11rem - env(safe-area-inset-bottom, 0px)); z-index: 1040; display: flex; flex-direction: column; border: 1px solid #555; border-radius: 1rem; background: #111; color: #f6f6f6; box-shadow: 0 12px 50px #0009; overflow: auto; }
+.chat-cabecera { display: flex; align-items: center; justify-content: space-between; gap: 1rem; padding: 1rem; border-bottom: 1px solid #363636; }
+.chat-cabecera h2 { font-size: 1.2rem; margin-bottom: .25rem; }
+.chat-cabecera small { color: #bbb; }
+.chat-cerrar { min-width: 44px; min-height: 44px; border: 0; border-radius: .5rem; background: #252525; color: #fff; font-size: 1.5rem; }
+.chat-historial { overflow-y: auto; min-height: 80px; padding: 1rem; overscroll-behavior: contain; }
+.chat-mensaje { padding: .8rem; background: #242424; border-radius: .75rem; white-space: pre-wrap; overflow-wrap: anywhere; font-size: .9rem; }
+.chat-mensaje strong { display: block; margin-bottom: .25rem; color: #ff9b50; }
+.chat-usuario { background: #3a2415; margin-left: 1rem; }
+.chat-formulario { padding: 1rem; border-top: 1px solid #363636; }
+.chat-aviso { color: #bbb; font-size: .75rem; line-height: 1.4; }
+.chat-error { color: #ffadb5; font-size: .85rem; }
+.chat-acciones { display: flex; justify-content: space-between; gap: .5rem; margin-top: .75rem; }
+.chat-formulario textarea { resize: vertical; max-height: 120px; }
+
+/* Acceso permanente al chat; espacio inferior para no tapar el pie. */
+.footer-biker { padding-bottom: calc(10rem + env(safe-area-inset-bottom, 0px)); }
+.whatsapp-flotante {
+    position: fixed;
+    right: calc(1.25rem + env(safe-area-inset-right, 0px));
+    bottom: calc(1.25rem + env(safe-area-inset-bottom, 0px));
+    z-index: 1030;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: .65rem;
+    min-width: 56px;
+    min-height: 56px;
+    padding: .85rem 1.25rem;
+    border: 1px solid #59e88d;
+    border-radius: 999px;
+    background: #25d366;
+    color: #082b15;
+    font-weight: 750;
+    text-decoration: none;
+    box-shadow: 0 6px 24px #0006;
+}
+.whatsapp-flotante:hover { background: #58e48c; color: #082b15; }
+.whatsapp-flotante:focus-visible { outline: 3px solid #fff; outline-offset: 4px; }
+@media (max-width: 575.98px) {
+    .whatsapp-flotante { padding: .85rem; }
+    .whatsapp-flotante span { display: none; }
+}
+
+@media (max-width: 991.98px) {
+    .navbar-biker .navbar-nav { align-items: stretch; padding-top: 1rem; }
+    .navbar-biker .nav-link { padding: .65rem .8rem; margin-left: 0; }
+    .hero-biker { gap: 1.5rem; }
+}
+@media (max-width: 767.98px) {
+    main { padding-top: .5rem; }
+    .hero-biker { flex-direction: column-reverse; align-items: flex-start; padding: 1.5rem 0 3rem; margin-bottom: 2.5rem; }
+    .hero-logo { width: 150px; max-width: 60%; }
+    .hero-biker h1 { font-size: clamp(2.5rem, 12vw, 4.5rem); }
+    .card-biker img, .card-img-biker { height: 180px; }
+}
+@media (prefers-reduced-motion: reduce) {
+    .card-biker { transition: none; }
+    .card-biker:has(a, button):hover { transform: none; }
+}

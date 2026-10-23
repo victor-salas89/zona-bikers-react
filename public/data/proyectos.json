@@ -1,0 +1,41 @@
+[
+  {
+    "id": 1,
+    "titulo": "Catálogo interactivo",
+    "descripcion": "Listado y detalle desde JSON, con cantidades y stock.",
+    "tecnologias": [
+      "React",
+      "Bootstrap",
+      "JSON"
+    ],
+    "imagen": "img/catalogo.svg",
+    "alt": "Ilustración de catálogo interactivo",
+    "demo": "/productos"
+  },
+  {
+    "id": 2,
+    "titulo": "Carrito de compras",
+    "descripcion": "Estado compartido, totales y persistencia al recargar.",
+    "tecnologias": [
+      "React Context",
+      "JavaScript",
+      "localStorage"
+    ],
+    "imagen": "img/carrito.svg",
+    "alt": "Ilustración de carrito de compras",
+    "demo": "/carrito"
+  },
+  {
+    "id": 3,
+    "titulo": "Acceso y administración",
+    "descripcion": "Formularios validados, cuentas locales y rutas por rol.",
+    "tecnologias": [
+      "React Router",
+      "React",
+      "Jasmine y Karma"
+    ],
+    "imagen": "img/acceso.svg",
+    "alt": "Ilustración de acceso y administración",
+    "demo": "/login"
+  }
+]

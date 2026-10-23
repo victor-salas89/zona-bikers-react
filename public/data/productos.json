@@ -1,0 +1,48 @@
+[
+  {
+    "id": 1,
+    "nombre": "Casco Integral",
+    "descripcion": "Casco integral para motociclista, ideal para conducción urbana y viajes en carretera.",
+    "precio": 79990,
+    "stock": 10,
+    "imagen": "https://www.bikesport.cl/cdn/shop/files/ATOM2_NEGRO_1.png?v=1762894616",
+    "alt": "Casco integral para motociclista",
+    "codigo": "CAS001",
+    "categoria": "cascos",
+    "precioOferta": 69990
+  },
+  {
+    "id": 2,
+    "nombre": "Guantes Biker",
+    "descripcion": "Guantes con protección para conducción y mayor agarre en la moto.",
+    "precio": 29990,
+    "stock": 15,
+    "imagen": "https://i0.wp.com/motosbaham.cl/wp-content/uploads/2023/09/guantes_moto_armad_cafe.jpg?fit=1000%2C1000&ssl=1",
+    "alt": "Guantes para motociclista",
+    "codigo": "GUA001",
+    "categoria": "guantes",
+    "precioOferta": 24990
+  },
+  {
+    "id": 3,
+    "nombre": "Chaqueta Biker",
+    "descripcion": "Chaqueta para motociclista con protecciones y estilo urbano para rodar con seguridad.",
+    "precio": 99990,
+    "stock": 8,
+    "imagen": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcThDrQ2S-s31MaAcLnGUbN-1--WgSdgkNHQuk0bzP82icRUKyFY-NOzlavy&s=10",
+    "alt": "Chaqueta para motociclista",
+    "codigo": "CHA001",
+    "categoria": "chaquetas"
+  },
+  {
+    "id": 4,
+    "nombre": "Protector de Rodilla",
+    "descripcion": "Protector para rodillas durante la conducción, con buena comodidad y seguridad.",
+    "precio": 39990,
+    "stock": 20,
+    "imagen": "https://images.unsplash.com/photo-1558980664-10e7170b5df9?auto=format&fit=crop&w=800&q=80",
+    "alt": "Protector para motociclista",
+    "codigo": "PRO001",
+    "categoria": "protecciones"
+  }
+]

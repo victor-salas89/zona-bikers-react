@@ -1,0 +1,43 @@
+{
+  "name": "zona-bikers-react",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "server": "node --env-file-if-exists=.env.local server/index.js",
+    "test:chat": "vitest run --config vitest.server.config.js --coverage",
+    "test": "npm run test:frontend && npm run test:chat && node scripts/actualizar-resultados.mjs",
+    "dev": "vite",
+    "build": "vite build",
+    "lint": "eslint .",
+    "preview": "vite preview",
+    "test:frontend": "vitest run --config vitest.config.js --coverage",
+    "test:coverage": "npm test",
+    "test:watch": "vitest --config vitest.config.js",
+    "test:browser:install": "playwright install chromium"
+  },
+  "dependencies": {
+    "bootstrap": "^5.3.8",
+    "react": "^19.3.1",
+    "react-bootstrap": "^2.10.10",
+    "react-dom": "^19.3.1",
+    "react-router-dom": "^7.18.4"
+  },
+  "devDependencies": {
+    "@eslint/js": "^10.0.1",
+    "@testing-library/dom": "^10.4.2",
+    "@testing-library/react": "^16.3.3",
+    "@types/react": "^19.3.0",
+    "@types/react-dom": "^19.3.0",
+    "@vitejs/plugin-react": "^6.1.2",
+    "eslint": "^10.13.0",
+    "eslint-plugin-react-hooks": "^7.1.1",
+    "eslint-plugin-react-refresh": "^0.5.7",
+    "globals": "^17.13.0",
+    "vite": "^8.3.4",
+    "vitest": "5.0.5",
+    "@vitest/browser-playwright": "5.0.5",
+    "@vitest/coverage-v8": "5.0.5",
+    "playwright": "1.64.1"
+  }
+}

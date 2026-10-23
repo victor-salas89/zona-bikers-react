@@ -1,0 +1,41 @@
+[
+  {
+    "id": 1,
+    "nombre": "Camilo Contreras",
+    "rol": "Estilos y vistas",
+    "bio": "Responsable del CSS, Bootstrap y las vistas de Zona Bikers.",
+    "foto": "img/perfil.svg",
+    "alt": "Avatar ilustrativo; no es una fotografía de Camilo Contreras",
+    "tecnologias": [
+      "CSS",
+      "Bootstrap",
+      "React"
+    ]
+  },
+  {
+    "id": 2,
+    "nombre": "Víctor Salas",
+    "rol": "Estructura e integración",
+    "bio": "Responsable del HTML, el login, las vistas y la integración final.",
+    "foto": "img/perfil.svg",
+    "alt": "Avatar ilustrativo; no es una fotografía de Víctor Salas",
+    "tecnologias": [
+      "HTML5",
+      "React",
+      "Git"
+    ]
+  },
+  {
+    "id": 3,
+    "nombre": "Kevin Valdes",
+    "rol": "Lógica y validaciones",
+    "bio": "Responsable del JavaScript, el carrito y las validaciones.",
+    "foto": "img/perfil.svg",
+    "alt": "Avatar ilustrativo; no es una fotografía de Kevin Valdes",
+    "tecnologias": [
+      "JavaScript",
+      "React",
+      "Jasmine"
+    ]
+  }
+]

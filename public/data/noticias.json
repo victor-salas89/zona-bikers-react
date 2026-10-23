@@ -1,0 +1,29 @@
+[
+  {
+    "id": 1,
+    "titulo": "Cómo elegir un casco adecuado",
+    "fecha": "2026-10-22",
+    "contenido": "Conoce algunos aspectos importantes que debes considerar al momento de elegir un casco para motocicleta.",
+    "video": "https://www.youtube.com/embed/t7DWoLRBArQ",
+    "tituloVideo": "Cómo elegir un casco adecuado",
+    "enlace": "/detalle-blog1"
+  },
+  {
+    "id": 2,
+    "titulo": "5 accesorios importantes para salir a la ruta",
+    "fecha": "2026-10-22",
+    "contenido": "Revisa algunos accesorios que pueden ayudarte a viajar con mayor comodidad y seguridad.",
+    "video": "https://www.youtube.com/embed/vDQi_yfDeyo",
+    "tituloVideo": "5 accesorios importantes para salir a la ruta",
+    "enlace": "/detalle-blog2"
+  },
+  {
+    "id": 3,
+    "titulo": "Consejos básicos para cuidar tu motocicleta",
+    "fecha": "2026-10-22",
+    "contenido": "Recomendaciones simples para mantener tu motocicleta en buenas condiciones.",
+    "video": "https://www.youtube.com/embed/mNK70U0IMnA",
+    "tituloVideo": "Consejos básicos para cuidar tu motocicleta",
+    "enlace": "/detalle-blog2"
+  }
+]
