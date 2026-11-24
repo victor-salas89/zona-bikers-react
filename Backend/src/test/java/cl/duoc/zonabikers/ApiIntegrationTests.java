@@ -70,6 +70,31 @@ class ApiIntegrationTests {
   assertEquals(204,request("POST","/api/auth/logout",null,token).statusCode());
   assertEquals(401,request("GET","/api/auth/me",null,token).statusCode());
  }
+ @Test void renovacionRotaTokenYConservaRol() throws Exception {
+  var r=request("POST","/api/auth/refresh",null,tc);assertEquals(200,r.statusCode(),r.body());
+  String nuevo=json(r).get("token").asText();assertNotEquals(tc,nuevo);
+  assertEquals("cliente",json(r).get("usuario").get("rol").asText());
+  assertTrue(Instant.parse(json(r).get("expira").asText()).isAfter(Instant.now()));
+  assertEquals(401,request("GET","/api/auth/me",null,tc).statusCode());
+  assertEquals(401,request("POST","/api/auth/refresh",null,tc).statusCode());
+  assertEquals(200,request("GET","/api/auth/me",null,nuevo).statusCode());
+  assertEquals(403,request("GET","/api/usuarios",null,nuevo).statusCode());
+  assertEquals(204,request("POST","/api/auth/logout",null,nuevo).statusCode());
+  assertEquals(401,request("POST","/api/auth/refresh",null,nuevo).statusCode());
+ }
+ @Test void renovacionRechazaSesionAusenteAlteradaYVencida() throws Exception {
+  assertEquals(401,request("POST","/api/auth/refresh",null,null).statusCode());
+  assertEquals(401,request("POST","/api/auth/refresh",null,tc+"x").statusCode());
+  var s=sesiones.findById(jwt.validar(tc).sesion()).orElseThrow();s.expira=Instant.now().minusSeconds(1);sesiones.save(s);
+  assertEquals(401,request("POST","/api/auth/refresh",null,tc).statusCode());
+ }
+ @Test void renovacionConcurrenteSoloAceptaUnaSolicitud() throws Exception {
+  try(var pool=Executors.newVirtualThreadPerTaskExecutor()) {
+   var a=pool.submit(()->request("POST","/api/auth/refresh",null,tc).statusCode());
+   var b=pool.submit(()->request("POST","/api/auth/refresh",null,tc).statusCode());
+   assertEquals(List.of(200,401),java.util.stream.Stream.of(a.get(),b.get()).sorted().toList());
+  }
+ }
  @Test void rechazaTokensAlteradosYExpirados() throws Exception {
   assertEquals(401,request("GET","/api/auth/me",null,tc+"x").statusCode());
   var s=sesiones.findAll().stream().filter(x->x.usuarioId.equals(cliente.id)).findFirst().orElseThrow();s.expira=Instant.now().minusSeconds(1);sesiones.save(s);

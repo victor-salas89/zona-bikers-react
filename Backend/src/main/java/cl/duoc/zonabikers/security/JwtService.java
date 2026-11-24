@@ -3,6 +3,9 @@ import cl.duoc.zonabikers.model.*;
 import cl.duoc.zonabikers.repository.*;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.server.ResponseStatusException;
+import static org.springframework.http.HttpStatus.UNAUTHORIZED;
 import org.springframework.security.oauth2.jwt.*;
 import org.springframework.security.oauth2.jose.jws.MacAlgorithm;
 import javax.crypto.spec.SecretKeySpec;
@@ -38,6 +41,15 @@ public class JwtService {
   Usuario u=usuarios.findById(s.usuarioId).orElseThrow(()->new BadJwtException("Usuario no disponible"));
   if(!jwt.getSubject().equals(u.id.toString()) || !s.expira.isAfter(Instant.now()) || s.versionUsuario!=u.versionSesion) throw new BadJwtException("Sesión vencida");
   return new Identidad(u.id,u.rol,s.id);
+ }
+ @Transactional public Token renovar(Identidad identidad) {
+  // El bloqueo serializa renovaciones y cambios de permisos de esta cuenta.
+  Usuario u=usuarios.bloquear(identidad.id()).orElseThrow(()->new ResponseStatusException(UNAUTHORIZED,"Usuario no disponible."));
+  Sesion anterior=sesiones.findById(identidad.sesion()).orElseThrow(()->new ResponseStatusException(UNAUTHORIZED,"Sesion cerrada."));
+  if(!anterior.usuarioId.equals(u.id) || !anterior.expira.isAfter(Instant.now()) || anterior.versionUsuario!=u.versionSesion)
+   throw new ResponseStatusException(UNAUTHORIZED,"Sesion vencida.");
+  sesiones.delete(anterior);
+  return crear(u);
  }
  public void cerrar(String id) {sesiones.deleteById(id);}
 }

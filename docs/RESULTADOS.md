@@ -1,11 +1,11 @@
 # Resultados de Vitest con Chromium
 
-Generado por `npm test`. Última ejecución: 24 de noviembre de 2026 a las 3:30 a. m. (America/Santiago).
+Generado por `npm test`. Última ejecución: 24 de noviembre de 2026 a las 12:29 p. m. (America/Santiago).
 
 ## Entorno y resultado
 
 - Vitest 5.0.5, Playwright 1.64.1, Node v26.7.0.
-- Frontend: **149/149 casos pasaron** en **Chromium 156.0.8078.4 headless**. No se usa Edge, Chrome instalado ni jsdom.
+- Frontend: **151/151 casos pasaron** en **Chromium 156.0.8078.4 headless**. No se usa Edge, Chrome instalado ni jsdom.
 - Servidor: **6/6 casos pasaron** en Vitest con Node.
 - Se conservaron los 120 escenarios originales del frontend y los 6 del servidor. Se verifica su identidad contra `casos-originales.json`; se normalizan el nombre del runner y el escenario de carga de productos, ahora mediante API REST. Las pruebas de persistencia y sesión se adaptaron al contrato HTTP de Evaluación 3.
 - Sin casos omitidos ni pendientes. Un caso frontend verifica la configuración; los otros cubren comportamiento de la aplicación.
@@ -14,10 +14,10 @@ Generado por `npm test`. Última ejecución: 24 de noviembre de 2026 a las 3:30 
 
 | Métrica | Cobertura | Cubierto / total |
 |---|---|---|
-| Sentencias | 98.11% | 780 / 795 |
-| Ramas | 95.8% | 503 / 525 |
-| Funciones | 98.57% | 207 / 210 |
-| Líneas | 98.57% | 623 / 632 |
+| Sentencias | 97.8% | 803 / 821 |
+| Ramas | 95.3% | 528 / 554 |
+| Funciones | 98.6% | 212 / 215 |
+| Líneas | 98.46% | 642 / 652 |
 
 Informe HTML: [frontend](../coverage/frontend/index.html). Umbrales mantenidos: 90% de sentencias, funciones y líneas; 85% de ramas. Si no se alcanzan, la prueba falla. [Alcance y análisis](COBERTURA.md).
 
@@ -172,25 +172,27 @@ Informe HTML: [servidor](../coverage/server/index.html). Se mide por separado; e
 | FE-128 | CarritoContext guarda el carrito en localStorage al agregar (mock de setItem) | Pasó |
 | FE-129 | CarritoContext al sumar cantidad no modifica los otros productos del carrito | Pasó |
 | FE-130 | CarritoContext al cambiar la cantidad no modifica los otros productos del carrito | Pasó |
-| FE-131 | Checkout de demostración navega desde carrito sin vaciarlo | Pasó |
-| FE-132 | Checkout de demostración valida campos vacíos y correo incorrecto antes de comprar | Pasó |
-| FE-133 | Checkout de demostración autocompleta por correo de sesión y permite corregir datos | Pasó |
-| FE-134 | Checkout de demostración acepta sesión parcial, cuenta ausente y sesión corrupta | Pasó |
-| FE-135 | Checkout de demostración reinicia comuna al cambiar región y actualiza entrega y total | Pasó |
-| FE-136 | Checkout de demostración guarda antes de vaciar, evita doble envío y restaura resultado al remontar | Pasó |
-| FE-137 | Checkout de demostración rechaza, conserva carrito y permite reintentar con aprobación | Pasó |
-| FE-138 | Checkout de demostración conserva carrito cuando falla guardado y permite reintentar | Pasó |
-| FE-139 | Checkout de demostración impide compra vacía y muestra resultado inexistente o corrupto sin caerse | Pasó |
-| FE-140 | Checkout de demostración rechaza región, comuna, entrega y estado inválidos; calcula ambas tarifas | Pasó |
-| FE-141 | Productos muestra una tarjeta por cada producto recibido (mock de fetch) | Pasó |
-| FE-142 | Productos pide los datos a la API REST de productos | Pasó |
-| FE-143 | Productos no muestra el mensaje de error cuando la carga resulta bien | Pasó |
-| FE-144 | Productos muestra un mensaje de error si fetch falla (mock de fetch rechazado) | Pasó |
-| FE-145 | Sesión JWT y transporte HTTP persiste la sesión y envía Bearer solo a solicitudes privadas | Pasó |
-| FE-146 | Sesión JWT y transporte HTTP descarta sesiones vencidas y borra la sesión ante 401 | Pasó |
-| FE-147 | Sesión JWT y transporte HTTP un 403 informa permisos y conserva una sesión válida | Pasó |
-| FE-148 | Sesión JWT y transporte HTTP limpia al expirar y al cerrar, también cuando hay datos corruptos | Pasó |
-| FE-149 | Sesión JWT y transporte HTTP comunica respuesta inválida y error de red | Pasó |
+| FE-131 | Sesión JWT y transporte HTTP renueva antes de una solicitud privada y comparte la renovacion concurrente | Pasó |
+| FE-132 | Sesión JWT y transporte HTTP no renueva sesiones cerradas y no restaura una sesion al recibir una respuesta tardia | Pasó |
+| FE-133 | Sesión JWT y transporte HTTP persiste la sesión y envía Bearer solo a solicitudes privadas | Pasó |
+| FE-134 | Sesión JWT y transporte HTTP descarta sesiones vencidas y borra la sesión ante 401 | Pasó |
+| FE-135 | Sesión JWT y transporte HTTP un 403 informa permisos y conserva una sesión válida | Pasó |
+| FE-136 | Sesión JWT y transporte HTTP limpia al expirar y al cerrar, también cuando hay datos corruptos | Pasó |
+| FE-137 | Sesión JWT y transporte HTTP comunica respuesta inválida y error de red | Pasó |
+| FE-138 | Checkout de demostración navega desde carrito sin vaciarlo | Pasó |
+| FE-139 | Checkout de demostración valida campos vacíos y correo incorrecto antes de comprar | Pasó |
+| FE-140 | Checkout de demostración autocompleta por correo de sesión y permite corregir datos | Pasó |
+| FE-141 | Checkout de demostración acepta sesión parcial, cuenta ausente y sesión corrupta | Pasó |
+| FE-142 | Checkout de demostración reinicia comuna al cambiar región y actualiza entrega y total | Pasó |
+| FE-143 | Checkout de demostración guarda antes de vaciar, evita doble envío y restaura resultado al remontar | Pasó |
+| FE-144 | Checkout de demostración rechaza, conserva carrito y permite reintentar con aprobación | Pasó |
+| FE-145 | Checkout de demostración conserva carrito cuando falla guardado y permite reintentar | Pasó |
+| FE-146 | Checkout de demostración impide compra vacía y muestra resultado inexistente o corrupto sin caerse | Pasó |
+| FE-147 | Checkout de demostración rechaza región, comuna, entrega y estado inválidos; calcula ambas tarifas | Pasó |
+| FE-148 | Productos muestra una tarjeta por cada producto recibido (mock de fetch) | Pasó |
+| FE-149 | Productos pide los datos a la API REST de productos | Pasó |
+| FE-150 | Productos no muestra el mensaje de error cuando la carga resulta bien | Pasó |
+| FE-151 | Productos muestra un mensaje de error si fetch falla (mock de fetch rechazado) | Pasó |
 
 ## Casos del servidor
 

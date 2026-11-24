@@ -31,6 +31,11 @@ public class ApiController {
   if(!encoder.matches(d.contrasena(),u.passwordHash)) throw new ResponseStatusException(UNAUTHORIZED,"El correo o la contraseña son incorrectos.");
   var t=jwt.crear(u);return Map.of("token",t.token(),"expira",t.expira(),"usuario",UsuarioVista.de(u));
  }
+ @PostMapping("/auth/refresh")
+ public Map<String,Object> renovar(@AuthenticationPrincipal Identidad i){
+  var t=jwt.renovar(i);
+  return Map.of("token",t.token(),"expira",t.expira(),"usuario",UsuarioVista.de(usuarios.findById(i.id()).orElseThrow()));
+ }
  @GetMapping("/auth/me") public UsuarioVista me(@AuthenticationPrincipal Identidad i){return UsuarioVista.de(usuarios.findById(i.id()).orElseThrow());}
  @PostMapping("/auth/logout") @ResponseStatus(NO_CONTENT)
  public void logout(@AuthenticationPrincipal Identidad i){jwt.cerrar(i.sesion());}
