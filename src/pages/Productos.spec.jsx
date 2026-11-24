@@ -28,7 +28,7 @@ describe("Productos", () => {
   it("muestra una tarjeta por cada producto recibido (mock de fetch)", async () => {
     // Mock: fetch responde con datos falsos, sin pedir el JSON real
     vi.spyOn(window, "fetch").mockReturnValue(
-      Promise.resolve({ json: () => Promise.resolve(datosFalsos) })
+      Promise.resolve({ ok: true, json: () => Promise.resolve(datosFalsos) })
     );
 
     renderizarPagina();
@@ -38,20 +38,20 @@ describe("Productos", () => {
     expect(screen.getByText("$79.990")).toBeTruthy();
   });
 
-  it("pide los datos a la ruta data/productos.json", async () => {
+  it("pide los datos a la API REST de productos", async () => {
     const espia = vi.spyOn(window, "fetch").mockReturnValue(
-      Promise.resolve({ json: () => Promise.resolve(datosFalsos) })
+      Promise.resolve({ ok: true, json: () => Promise.resolve(datosFalsos) })
     );
 
     renderizarPagina();
     await screen.findByRole("heading", { name: "Casco Integral" });
 
-    expect(espia).toHaveBeenCalledWith("/data/productos.json");
+    expect(espia).toHaveBeenCalledWith("http://localhost:8080/api/productos", expect.objectContaining({ method: "GET" }));
   });
 
   it("no muestra el mensaje de error cuando la carga resulta bien", async () => {
     vi.spyOn(window, "fetch").mockReturnValue(
-      Promise.resolve({ json: () => Promise.resolve(datosFalsos) })
+      Promise.resolve({ ok: true, json: () => Promise.resolve(datosFalsos) })
     );
 
     renderizarPagina();

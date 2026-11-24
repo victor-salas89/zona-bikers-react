@@ -1,23 +1,23 @@
 # Resultados de Vitest con Chromium
 
-Generado por `npm test`. Última ejecución: 23 de octubre de 2026 a las 3:48 a. m. (America/Santiago).
+Generado por `npm test`. Última ejecución: 24 de noviembre de 2026 a las 3:30 a. m. (America/Santiago).
 
 ## Entorno y resultado
 
-- Vitest 5.0.5, Playwright 1.64.1, Node v24.19.0.
-- Frontend: **142/142 casos pasaron** en **Chromium 156.0.8078.4 headless**. No se usa Edge, Chrome instalado ni jsdom.
+- Vitest 5.0.5, Playwright 1.64.1, Node v26.7.0.
+- Frontend: **149/149 casos pasaron** en **Chromium 156.0.8078.4 headless**. No se usa Edge, Chrome instalado ni jsdom.
 - Servidor: **6/6 casos pasaron** en Vitest con Node.
-- Se conservaron los 120 casos originales del frontend y los 6 del servidor. Se verifica su identidad contra `casos-originales.json`; solo se renombra el grupo inicial Karma + Jasmine a Vitest + Chromium.
+- Se conservaron los 120 escenarios originales del frontend y los 6 del servidor. Se verifica su identidad contra `casos-originales.json`; se normalizan el nombre del runner y el escenario de carga de productos, ahora mediante API REST. Las pruebas de persistencia y sesión se adaptaron al contrato HTTP de Evaluación 3.
 - Sin casos omitidos ni pendientes. Un caso frontend verifica la configuración; los otros cubren comportamiento de la aplicación.
 
 ## Cobertura del frontend
 
 | Métrica | Cobertura | Cubierto / total |
 |---|---|---|
-| Sentencias | 98.51% | 664 / 674 |
-| Ramas | 96.76% | 449 / 464 |
-| Funciones | 99.46% | 187 / 188 |
-| Líneas | 98.89% | 536 / 542 |
+| Sentencias | 98.11% | 780 / 795 |
+| Ramas | 95.8% | 503 / 525 |
+| Funciones | 98.57% | 207 / 210 |
+| Líneas | 98.57% | 623 / 632 |
 
 Informe HTML: [frontend](../coverage/frontend/index.html). Umbrales mantenidos: 90% de sentencias, funciones y líneas; 85% de ramas. Si no se alcanzan, la prueba falla. [Alcance y análisis](COBERTURA.md).
 
@@ -145,45 +145,52 @@ Informe HTML: [servidor](../coverage/server/index.html). Se mide por separado; e
 | FE-101 | ChatBiker muestra el error de JSON inválido, conserva la consulta y permite reintentar | Pasó |
 | FE-102 | ChatBiker muestra el error de respuesta vacía, conserva la consulta y permite reintentar | Pasó |
 | FE-103 | ChatBiker limpia conversación y errores, devuelve el foco y no reenvía el historial borrado | Pasó |
-| FE-104 | ProtectedRoute redirige a /login si no hay sesión | Pasó |
-| FE-105 | ProtectedRoute muestra el contenido a un administrador | Pasó |
-| FE-106 | ProtectedRoute muestra el contenido a un vendedor (roles por defecto) | Pasó |
-| FE-107 | ProtectedRoute redirige a inicio si el rol no está permitido | Pasó |
-| FE-108 | ProtectedRoute respeta una lista de roles personalizada | Pasó |
-| FE-109 | ProtectedRoute redirige a /login si lo guardado no es JSON válido (mock de getItem) | Pasó |
-| FE-110 | TarjetaProducto muestra nombre, descripción y precio formateado | Pasó |
-| FE-111 | TarjetaProducto muestra la imagen con su texto alternativo | Pasó |
-| FE-112 | TarjetaProducto enlaza a la página de detalle con el id del producto | Pasó |
-| FE-113 | TarjetaProducto agrega el producto al carrito al hacer clic | Pasó |
-| FE-114 | TarjetaProducto suma la cantidad si se agrega dos veces el mismo producto | Pasó |
-| FE-115 | CarritoContext inicia vacío | Pasó |
-| FE-116 | CarritoContext agrega un producto nuevo con cantidad 1 | Pasó |
-| FE-117 | CarritoContext suma la cantidad si el producto ya estaba en el carrito | Pasó |
-| FE-118 | CarritoContext agrega con la cantidad indicada | Pasó |
-| FE-119 | CarritoContext cambia la cantidad de un producto | Pasó |
-| FE-120 | CarritoContext ignora un cambio de cantidad a 0 o negativo | Pasó |
-| FE-121 | CarritoContext elimina un producto por id | Pasó |
-| FE-122 | CarritoContext vacía el carrito | Pasó |
-| FE-123 | CarritoContext calcula el total y la cantidad total | Pasó |
-| FE-124 | CarritoContext carga el carrito guardado en localStorage al iniciar | Pasó |
-| FE-125 | CarritoContext usa un carrito vacío si lo guardado no es JSON válido (mock de getItem) | Pasó |
-| FE-126 | CarritoContext guarda el carrito en localStorage al agregar (mock de setItem) | Pasó |
-| FE-127 | CarritoContext al sumar cantidad no modifica los otros productos del carrito | Pasó |
-| FE-128 | CarritoContext al cambiar la cantidad no modifica los otros productos del carrito | Pasó |
-| FE-129 | Checkout de demostración navega desde carrito sin vaciarlo | Pasó |
-| FE-130 | Checkout de demostración valida campos vacíos y correo incorrecto antes de comprar | Pasó |
-| FE-131 | Checkout de demostración autocompleta por correo de sesión y permite corregir datos | Pasó |
-| FE-132 | Checkout de demostración acepta sesión parcial, cuenta ausente y sesión corrupta | Pasó |
-| FE-133 | Checkout de demostración reinicia comuna al cambiar región y actualiza entrega y total | Pasó |
-| FE-134 | Checkout de demostración guarda antes de vaciar, evita doble envío y restaura resultado al remontar | Pasó |
-| FE-135 | Checkout de demostración rechaza, conserva carrito y permite reintentar con aprobación | Pasó |
-| FE-136 | Checkout de demostración conserva carrito cuando falla guardado y permite reintentar | Pasó |
-| FE-137 | Checkout de demostración impide compra vacía y muestra resultado inexistente o corrupto sin caerse | Pasó |
-| FE-138 | Checkout de demostración rechaza región, comuna, entrega y estado inválidos; calcula ambas tarifas | Pasó |
-| FE-139 | Productos muestra una tarjeta por cada producto recibido (mock de fetch) | Pasó |
-| FE-140 | Productos pide los datos a la ruta data/productos.json | Pasó |
-| FE-141 | Productos no muestra el mensaje de error cuando la carga resulta bien | Pasó |
-| FE-142 | Productos muestra un mensaje de error si fetch falla (mock de fetch rechazado) | Pasó |
+| FE-104 | importa registros nuevos y conserva conflictos sin enviar contraseñas antiguas | Pasó |
+| FE-105 | conserva datos si falta contraseña o la API falla y permite reintentar | Pasó |
+| FE-106 | ProtectedRoute redirige a /login si no hay sesión | Pasó |
+| FE-107 | ProtectedRoute muestra el contenido a un administrador | Pasó |
+| FE-108 | ProtectedRoute muestra el contenido a un vendedor (roles por defecto) | Pasó |
+| FE-109 | ProtectedRoute redirige a inicio si el rol no está permitido | Pasó |
+| FE-110 | ProtectedRoute respeta una lista de roles personalizada | Pasó |
+| FE-111 | ProtectedRoute redirige a /login si lo guardado no es JSON válido (mock de getItem) | Pasó |
+| FE-112 | TarjetaProducto muestra nombre, descripción y precio formateado | Pasó |
+| FE-113 | TarjetaProducto muestra la imagen con su texto alternativo | Pasó |
+| FE-114 | TarjetaProducto enlaza a la página de detalle con el id del producto | Pasó |
+| FE-115 | TarjetaProducto agrega el producto al carrito al hacer clic | Pasó |
+| FE-116 | TarjetaProducto suma la cantidad si se agrega dos veces el mismo producto | Pasó |
+| FE-117 | CarritoContext inicia vacío | Pasó |
+| FE-118 | CarritoContext agrega un producto nuevo con cantidad 1 | Pasó |
+| FE-119 | CarritoContext suma la cantidad si el producto ya estaba en el carrito | Pasó |
+| FE-120 | CarritoContext agrega con la cantidad indicada | Pasó |
+| FE-121 | CarritoContext cambia la cantidad de un producto | Pasó |
+| FE-122 | CarritoContext ignora un cambio de cantidad a 0 o negativo | Pasó |
+| FE-123 | CarritoContext elimina un producto por id | Pasó |
+| FE-124 | CarritoContext vacía el carrito | Pasó |
+| FE-125 | CarritoContext calcula el total y la cantidad total | Pasó |
+| FE-126 | CarritoContext carga el carrito guardado en localStorage al iniciar | Pasó |
+| FE-127 | CarritoContext usa un carrito vacío si lo guardado no es JSON válido (mock de getItem) | Pasó |
+| FE-128 | CarritoContext guarda el carrito en localStorage al agregar (mock de setItem) | Pasó |
+| FE-129 | CarritoContext al sumar cantidad no modifica los otros productos del carrito | Pasó |
+| FE-130 | CarritoContext al cambiar la cantidad no modifica los otros productos del carrito | Pasó |
+| FE-131 | Checkout de demostración navega desde carrito sin vaciarlo | Pasó |
+| FE-132 | Checkout de demostración valida campos vacíos y correo incorrecto antes de comprar | Pasó |
+| FE-133 | Checkout de demostración autocompleta por correo de sesión y permite corregir datos | Pasó |
+| FE-134 | Checkout de demostración acepta sesión parcial, cuenta ausente y sesión corrupta | Pasó |
+| FE-135 | Checkout de demostración reinicia comuna al cambiar región y actualiza entrega y total | Pasó |
+| FE-136 | Checkout de demostración guarda antes de vaciar, evita doble envío y restaura resultado al remontar | Pasó |
+| FE-137 | Checkout de demostración rechaza, conserva carrito y permite reintentar con aprobación | Pasó |
+| FE-138 | Checkout de demostración conserva carrito cuando falla guardado y permite reintentar | Pasó |
+| FE-139 | Checkout de demostración impide compra vacía y muestra resultado inexistente o corrupto sin caerse | Pasó |
+| FE-140 | Checkout de demostración rechaza región, comuna, entrega y estado inválidos; calcula ambas tarifas | Pasó |
+| FE-141 | Productos muestra una tarjeta por cada producto recibido (mock de fetch) | Pasó |
+| FE-142 | Productos pide los datos a la API REST de productos | Pasó |
+| FE-143 | Productos no muestra el mensaje de error cuando la carga resulta bien | Pasó |
+| FE-144 | Productos muestra un mensaje de error si fetch falla (mock de fetch rechazado) | Pasó |
+| FE-145 | Sesión JWT y transporte HTTP persiste la sesión y envía Bearer solo a solicitudes privadas | Pasó |
+| FE-146 | Sesión JWT y transporte HTTP descarta sesiones vencidas y borra la sesión ante 401 | Pasó |
+| FE-147 | Sesión JWT y transporte HTTP un 403 informa permisos y conserva una sesión válida | Pasó |
+| FE-148 | Sesión JWT y transporte HTTP limpia al expirar y al cerrar, también cuando hay datos corruptos | Pasó |
+| FE-149 | Sesión JWT y transporte HTTP comunica respuesta inválida y error de red | Pasó |
 
 ## Casos del servidor
 

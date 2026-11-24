@@ -1,3 +1,4 @@
+import { simularApi, sesionPrueba } from './test/apiSimulada';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, fireEvent, cleanup, waitFor, within, renderHook, act } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
@@ -17,8 +18,9 @@ const click = nombre => fireEvent.click(screen.getByRole('button', { name: nombr
 const tarjetas = () => screen.queryAllByRole('article');
 const cuenta = { nombre: 'Ana', correo: 'ana@example.com', direccion: 'Calle 123', region: 'Región Metropolitana', comuna: 'Santiago' };
 
+let simulacion;
 beforeEach(() => {
-  vi.spyOn(window, 'fetch').mockResolvedValue({ ok: true, json: async () => productos });
+  simulacion = simularApi(productos);
   vi.spyOn(window, 'alert').mockImplementation(() => {});
 });
 
@@ -59,7 +61,7 @@ describe('Categorías públicas y ofertas', () => {
   });
 
   it('muestra Ofertas vacía cuando ninguna oferta es válida y comunica errores de carga', async () => {
-    localStorage.setItem('productosBikers', JSON.stringify([{ ...casco, precioOferta: 0 }]));
+    simulacion.estado.productos = [{ ...casco, precioOferta: 0 }];
     abrir('/ofertas'); expect(await screen.findByRole('status')).toBeTruthy();
     cleanup(); window.fetch.mockRejectedValue(new Error('sin red'));
     abrir('/ofertas'); expect(await screen.findByText('No se pudieron cargar los productos.')).toBeTruthy();
@@ -69,6 +71,7 @@ describe('Categorías públicas y ofertas', () => {
   it('mantiene productos locales antiguos sin escribir ni borrar almacenamiento al leerlos', async () => {
     const antiguos = [{ ...casco, categoria: undefined, precioOferta: undefined }, { ...casco, id: 99, codigo: 'LEGADO', categoria: 'invalida', precioOferta: undefined }];
     const guardados = JSON.stringify(antiguos); localStorage.setItem('productosBikers', guardados);
+    simulacion.estado.productos = antiguos;
     const lista = await cargarProductos();
     expect(lista.map(p => p.categoria)).toEqual(['cascos', 'otros']);
     expect(precioVigente(lista[0])).toBe(10000);
@@ -88,7 +91,7 @@ describe('Categorías públicas y ofertas', () => {
   });
 
   it('crea producto con categoría y oferta desde administración y lo publica en Ofertas', async () => {
-    sessionStorage.setItem('usuario', JSON.stringify({ correo: 'admin@duoc.cl', rol: 'administrador' }));
+    sesionPrueba();
     abrir('/admin-nuevo-producto');
     cambiar('Código', 'CHA002'); cambiar('Nombre', 'Chaqueta Nueva'); cambiar('Descripción', 'Chaqueta de prueba');
     cambiar('Precio', '20000'); cambiar('Stock', '4'); cambiar('Categoría', 'chaquetas');
@@ -103,7 +106,7 @@ describe('Categorías públicas y ofertas', () => {
   });
 
   it('edita categoría y oferta, valida bajar el precio normal y permite retirar la oferta', async () => {
-    sessionStorage.setItem('usuario', JSON.stringify({ correo: 'admin@duoc.cl', rol: 'administrador' }));
+    sesionPrueba();
     abrir('/admin-nuevo-producto?id=1'); await screen.findByLabelText('Nombre');
     expect(screen.getByLabelText('Categoría').value).toBe('cascos'); expect(screen.getByLabelText('Precio de oferta (opcional)').value).toBe('8000');
     cambiar('Precio', '7000'); click('Guardar producto'); expect(screen.getByText(/El precio de oferta debe/)).toBeTruthy();
@@ -117,6 +120,7 @@ describe('Categorías públicas y ofertas', () => {
   });
 
   it('usa el mismo precio en catálogo, detalle, carrito, checkout y pedido recargado', async () => {
+    sesionPrueba('cliente');
     abrir('/ofertas'); await screen.findByText('Casco Ruta');
     const tarjeta = tarjetas().find(t => t.textContent.includes('Casco Ruta'));
     expect(within(tarjeta).getByText('$8.000')).toBeTruthy();
@@ -132,12 +136,11 @@ describe('Categorías públicas y ofertas', () => {
     expect(screen.getByText(/Cantidad: 2 — \$8.000 c\/u — \$16.000/)).toBeTruthy();
     for (const [etiqueta, campo] of [['Nombre', 'nombre'], ['Correo', 'correo'], ['Dirección', 'direccion'], ['Región', 'region'], ['Comuna', 'comuna']]) cambiar(etiqueta, cuenta[campo]);
     cambiar('Opción de entrega', 'domicilio'); expect(screen.getByText('$19.990')).toBeTruthy();
-    click('Confirmar compra simulada'); expect(screen.getByRole('heading', { name: 'Compra aprobada' })).toBeTruthy();
-    const clave = Object.keys(localStorage).find(k => k.startsWith('pedidoBikers:'));
-    const pedido = JSON.parse(localStorage.getItem(clave));
+    click('Confirmar compra simulada'); expect(await screen.findByRole('heading', { name: 'Compra aprobada' })).toBeTruthy();
+    const pedido = simulacion.estado.pedidos[0];
     expect(pedido.productos[0].precio).toBe(8000); expect(pedido.productos[0].precioOferta).toBeUndefined(); expect(pedido.total).toBe(19990);
     localStorage.setItem('productosBikers', JSON.stringify([{ ...casco, precioOferta: 5000 }]));
-    cleanup(); abrir(`/compra/${pedido.id}`); expect(screen.getByText('$19.990')).toBeTruthy();
+    cleanup(); abrir(`/compra/${pedido.id}`); expect(await screen.findByText('$19.990')).toBeTruthy();
     expect(screen.getByText(/Cantidad: 2 — \$8.000 c\/u/)).toBeTruthy();
   });
 
@@ -153,9 +156,9 @@ describe('Categorías públicas y ofertas', () => {
 
   it('conserva precio y unidades de oferta ante rechazo y permite reintentar', async () => {
     localStorage.setItem('carritoBikers', JSON.stringify([{ ...casco, cantidad: 2 }]));
-    localStorage.setItem('usuariosBikers', JSON.stringify([cuenta])); sessionStorage.setItem('usuario', JSON.stringify({ correo: cuenta.correo, rol: 'cliente' }));
+    sesionPrueba('cliente', cuenta);
     abrir('/checkout'); cambiar('Opción de entrega', 'retiro'); cambiar('Resultado a simular', 'rechazada'); click('Confirmar compra simulada');
-    expect(screen.getByRole('heading', { name: 'Compra rechazada' })).toBeTruthy();
+    expect(await screen.findByRole('heading', { name: 'Compra rechazada' })).toBeTruthy();
     expect(screen.getByText('$16.000')).toBeTruthy();
     expect(JSON.parse(localStorage.getItem('carritoBikers'))[0]).toMatchObject({ precio: 10000, precioOferta: 8000, cantidad: 2 });
     fireEvent.click(screen.getByRole('link', { name: 'Reintentar compra' })); cambiar('Opción de entrega', 'retiro'); click('Confirmar compra simulada');

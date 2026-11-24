@@ -23,7 +23,7 @@ export default function AdminProductos() {
   return <><AdminMenu /><h1>Administración de productos</h1>
   <Button as={Link} to="/admin-nuevo-producto">Crear nuevo producto</Button>
   {error && <p role="alert">{error}</p>}
-  <Table striped bordered responsive className="mt-4"><caption>Catálogo guardado en este navegador</caption>
+  <Table striped bordered responsive className="mt-4"><caption>Catálogo de Zona Bikers</caption>
    <thead><tr><th scope="col">Código</th><th scope="col">Nombre</th><th scope="col">Precio</th><th scope="col">Stock</th><th scope="col">Acciones</th></tr></thead>
    <tbody>{productos.map(p => <tr key={p.id}><td>{p.codigo}</td><th scope="row">{p.nombre}</th><td>${p.precio.toLocaleString('es-CL')}</td><td>{p.stock}</td><td>
     <Link className="btn btn-outline-secondary btn-sm me-2" to={`/admin-nuevo-producto?id=${p.id}`}>Editar {p.nombre}</Link>

@@ -1,3 +1,4 @@
+import { simularApi, sesionPrueba } from './test/apiSimulada';
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import { render, screen, fireEvent, cleanup } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
@@ -5,16 +6,16 @@ import App from './App';
 import { CarritoProvider } from './context/CarritoContext';
 
 function abrir(ruta) {
-  sessionStorage.setItem('usuario', JSON.stringify({ correo: 'admin@duoc.cl', rol: 'administrador' }));
+  sesionPrueba();
   return render(<MemoryRouter initialEntries={[ruta]}><CarritoProvider><App /></CarritoProvider></MemoryRouter>);
 }
 function cambiar(nombre, value) { fireEvent.change(screen.getByLabelText(nombre), { target: { value } }); }
 
 describe('Validaciones administrativas adicionales', () => {
-  beforeEach(() => { localStorage.clear(); sessionStorage.clear(); });
+  beforeEach(() => { localStorage.clear(); sessionStorage.clear(); simularApi(); });
   afterEach(cleanup);
   it('informa catálogo vacío en vez de permanecer cargando', async () => {
-    vi.spyOn(window, 'fetch').mockReturnValue(Promise.resolve({ok:true,json:()=>Promise.resolve([])}));
+    simularApi();
     abrir('/detalle-producto?id=1');
     expect(await screen.findByText('No hay productos disponibles.')).toBeTruthy();
   });
@@ -27,7 +28,7 @@ describe('Validaciones administrativas adicionales', () => {
   });
   it('conserva región y comuna y rechaza RUN incorrecto', () => {
     abrir('/admin-nuevo-usuario');
-    cambiar('Nombre', 'Ana'); cambiar('Correo', 'ana@gmail.com'); cambiar('Contraseña', '12345');
+    cambiar('Nombre', 'Ana'); cambiar('Correo', 'ana@gmail.com'); cambiar('Contraseña', 'Prueba123');
     cambiar('RUN (opcional)', '123456784');
     cambiar('Región', 'Región Metropolitana'); cambiar('Comuna', 'Santiago');
     cambiar('Región', 'Región de Valparaíso');
@@ -37,7 +38,7 @@ describe('Validaciones administrativas adicionales', () => {
   });
   it('rechaza stock crítico negativo y avisa cuando el stock es bajo', async () => {
     vi.spyOn(window, 'alert').mockImplementation(() => {});
-    vi.spyOn(window, 'fetch').mockReturnValue(Promise.resolve({ok:true,json:()=>Promise.resolve([])}));
+    simularApi();
     abrir('/admin-nuevo-producto');
     cambiar('Código','NUE001'); cambiar('Nombre','Producto nuevo'); cambiar('Descripción','Descripción de prueba');
     cambiar('Precio','12000'); cambiar('Stock','2'); cambiar('Stock crítico (opcional)','-1');

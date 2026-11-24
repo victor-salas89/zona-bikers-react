@@ -6,7 +6,7 @@ import Form from "react-bootstrap/Form";
 import Button from "react-bootstrap/Button";
 import CampoFormulario from "../components/CampoFormulario";
 import { regionesYComunas } from "../data/usuarios";
-import { guardarUsuario } from "../utils/cuentas";
+import { registrarUsuario } from "../utils/cuentas";
 import { validarRegistro, validarLogin } from "../utils/validaciones";
 
 /** Valores iniciales (vacíos) del formulario de registro. */
@@ -24,7 +24,7 @@ const datosIniciales = {
 /**
  * Página de registro de usuario.
  * Mantiene los datos en un solo estado, valida con validarRegistro al enviar
- * y crea una cuenta local si el registro es válido. La lista de comunas depende
+ * y crea una cuenta cliente en la API. La lista de comunas depende
  * de la región elegida; al cambiar de región, la comuna se reinicia.
  *
  * @returns {JSX.Element} Formulario de registro.
@@ -54,15 +54,15 @@ function Registro() {
    *
    * @param {Event} evento - Evento submit del formulario.
    */
-  const manejarEnvio = (evento) => {
+  const manejarEnvio = async (evento) => {
     evento.preventDefault();
     const nuevosErrores = { ...validarRegistro(datos), ...validarLogin(datos.correo, datos.contrasena) };
     setErrores(nuevosErrores);
 
     if (Object.keys(nuevosErrores).length === 0) {
-      try { guardarUsuario({ ...datos, rol: "cliente" }); }
+      try { await registrarUsuario(datos); }
       catch (error) { setErrores({ correo: error.message }); return; }
-      alert("Cuenta local creada. Ya puedes iniciar sesión en este navegador.");
+      alert("Cuenta creada. Ya puedes iniciar sesión.");
       setDatos(datosIniciales);
     }
   };

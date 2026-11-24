@@ -1,0 +1,15 @@
+{
+  "fecha": "2026-11-24T06:31:51.248Z",
+  "motor": "MySQL 8.4.3",
+  "base": "temporal aislada; eliminada al terminar",
+  "resultado": "PASS",
+  "checks": [
+    "Arranque Spring Boot 4.2 / Java 21 / MySQL y carga inicial de cuatro productos",
+    "Login administrador y alta/edición de producto desde React persistidos en MySQL",
+    "Vendedor sin acceso a usuarios y registro público sin escalada de rol",
+    "Registro/login cliente, persistencia tras recarga y restricciones React/API",
+    "Carrito y checkout React → API → MySQL, total con oferta y despacho, stock descontado y pedido recuperado",
+    "Pedidos privados, stock insuficiente, logout revocable, eliminación CRUD y OpenAPI HTTP 200",
+    "Swagger UI: Try it out y Execute de GET /api/prueba con respuesta 200"
+  ]
+}

@@ -1,3 +1,4 @@
+import { sesionPrueba } from '../test/apiSimulada';
 import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { render, screen } from "@testing-library/react";
 import { MemoryRouter, Routes, Route } from "react-router-dom";
@@ -24,7 +25,7 @@ function renderizarRuta(props = {}) {
 }
 
 function iniciarSesion(rol) {
-  sessionStorage.setItem("usuario", JSON.stringify({ nombre: "Ana", rol }));
+  sesionPrueba(rol, { nombre: "Ana" });
 }
 
 describe("ProtectedRoute", () => {
