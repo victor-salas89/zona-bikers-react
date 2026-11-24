@@ -40,7 +40,7 @@ export function validarRut(rut) {
 /**
  * Valida los datos del inicio de sesión.
  * Correo: obligatorio, de hasta 100 caracteres y de un dominio permitido.
- * Contraseña: obligatoria, de 4 a 10 caracteres.
+ * Contraseña: obligatoria, al menos 8 caracteres y hasta 72 bytes UTF-8.
  *
  * @param {string} correo - Correo ingresado.
  * @param {string} contrasena - Contraseña ingresada.
@@ -50,7 +50,7 @@ export function validarRut(rut) {
 export function validarLogin(correo, contrasena) {
   const errores = {};
   const c = correo.trim();
-  const p = contrasena.trim();
+  const p = contrasena;
 
   if (c === "") errores.correo = "El correo es requerido.";
   else if (c.length > 100)
@@ -60,8 +60,8 @@ export function validarLogin(correo, contrasena) {
       "Solo se permiten correos @duoc.cl, @profesor.duoc.cl o @gmail.com.";
 
   if (p === "") errores.contrasena = "La contraseña es requerida.";
-  else if (p.length < 4 || p.length > 10)
-    errores.contrasena = "La contraseña debe tener entre 4 y 10 caracteres.";
+  else if (p.length < 8 || new TextEncoder().encode(p).length > 72)
+    errores.contrasena = "La contraseña debe tener al menos 8 caracteres y hasta 72 bytes.";
 
   return errores;
 }

@@ -1,24 +1,16 @@
-import { dbUsuarios } from '../data/usuarios.js';
-import { leerLista, guardarLista } from './almacenamiento.js';
-
-/** Cuentas de demostración locales; no sustituye autenticación de servidor. */
-export const obtenerUsuarios = () => leerLista('usuariosBikers', dbUsuarios);
-
-/** Crea o actualiza una cuenta y evita correos repetidos. */
-export function guardarUsuario(datos, correoAnterior) {
-  const correo = datos.correo.trim().toLowerCase();
-  const usuarios = obtenerUsuarios();
-  if (usuarios.some(u => u.correo === correo && u.correo !== correoAnterior)) {
-    throw new Error('Ya existe una cuenta con ese correo.');
-  }
-  const usuario = {
-    ...datos,
-    correo
-  };
-  guardarLista('usuariosBikers', correoAnterior ? usuarios.map(u => u.correo === correoAnterior ? usuario : u) : [...usuarios, usuario]);
+import { api } from './api';
+import { guardarSesion, limpiarSesion } from './sesion';
+export const obtenerUsuarios = () => api('/usuarios');
+export const obtenerUsuario = id => api('/usuarios/' + encodeURIComponent(id));
+export const guardarUsuario = (datos, id) => api(id ? '/usuarios/' + encodeURIComponent(id) : '/usuarios', { method: id ? 'PUT' : 'POST', body: datos });
+export const registrarUsuario = datos => api('/auth/registro', { method: 'POST', body: datos, publico: true });
+export const eliminarUsuario = id => api('/usuarios/' + encodeURIComponent(id), { method: 'DELETE' });
+export async function iniciarSesion(correo, contrasena) {
+  const sesion = await api('/auth/login', { method: 'POST', body: { correo: correo.trim().toLowerCase(), contrasena }, publico: true });
+  guardarSesion(sesion);
+  return sesion.usuario;
 }
-
-/** Elimina una cuenta local. */
-export function eliminarUsuario(correo) {
-  guardarLista('usuariosBikers', obtenerUsuarios().filter(u => u.correo !== correo));
+export async function cerrarSesion() {
+  await api('/auth/logout', { method: 'POST' });
+  limpiarSesion();
 }

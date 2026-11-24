@@ -1,4 +1,5 @@
 import Checkout from "./pages/Checkout";
+import VerificarSesion from './components/VerificarSesion';
 import ResultadoCompra from "./pages/ResultadoCompra";
 import { Routes, Route } from "react-router-dom";
 import NavbarSuperior from "./components/NavbarSuperior";
@@ -39,6 +40,7 @@ function App() {
     <>
       <a className="visually-hidden-focusable p-3 d-block" href="#contenido" onClick={evento => { evento.preventDefault(); document.getElementById('contenido').focus(); }}>Saltar al contenido</a>
       <NavbarSuperior />
+      <VerificarSesion />
       <main id="contenido" tabIndex={-1} className="container my-4">
         <Routes>
           <Route path="/" element={<Inicio />} />
@@ -49,8 +51,8 @@ function App() {
           <Route path="/noticias" element={<Noticias />} />
           <Route path="/contacto" element={<Contacto />} />
           <Route path="/login" element={<Login />} />
-          <Route path="/checkout" element={<Checkout />} />
-          <Route path="/compra/:id" element={<ResultadoCompra />} />
+          <Route path="/checkout" element={<ProtectedRoute roles={['cliente', 'vendedor', 'administrador']}><Checkout /></ProtectedRoute>} />
+          <Route path="/compra/:id" element={<ProtectedRoute roles={['cliente', 'vendedor', 'administrador']}><ResultadoCompra /></ProtectedRoute>} />
           <Route path="/carrito" element={<Carrito />} />
           <Route path="/registro" element={<Registro />} />
           <Route path="/detalle-producto" element={<DetalleProducto />} />

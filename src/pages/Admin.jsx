@@ -4,6 +4,8 @@ import Col from "react-bootstrap/Col";
 import Card from "react-bootstrap/Card";
 import Button from "react-bootstrap/Button";
 import AdminMenu from "../components/AdminMenu";
+import { useUsuario } from '../utils/sesion';
+import MigracionLocal from '../components/MigracionLocal';
 
 /**
  * Panel principal de administración.
@@ -13,9 +15,11 @@ import AdminMenu from "../components/AdminMenu";
  * @returns {JSX.Element} Página de inicio del panel de administración.
  */
 function Admin() {
+  const usuario = useUsuario();
   return (
     <>
       <AdminMenu />
+      {usuario?.rol === 'administrador' && <MigracionLocal />}
       <section>
         <h1>Panel de administración</h1>
         <p>Bienvenido al área administrativa de Zona Bikers.</p>
@@ -36,7 +40,7 @@ function Admin() {
               </Card.Body>
             </Card>
           </Col>
-          <Col>
+          {usuario?.rol === 'administrador' && <Col>
             <Card className="card-biker h-100">
               <Card.Body>
                 <h3 className="h5">Usuarios</h3>
@@ -46,7 +50,7 @@ function Admin() {
                 <Button as={Link} to="/admin-usuarios">Administrar usuarios</Button>
               </Card.Body>
             </Card>
-          </Col>
+          </Col>}
         </Row>
       </section>
     </>

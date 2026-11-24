@@ -3,6 +3,8 @@ import { useState } from 'react';
 import Navbar from "react-bootstrap/Navbar";
 import Nav from "react-bootstrap/Nav";
 import Container from "react-bootstrap/Container";
+import { useUsuario } from '../utils/sesion';
+import { cerrarSesion } from '../utils/cuentas';
 
 /**
  * Barra de navegación principal de la tienda.
@@ -15,12 +17,16 @@ function NavbarSuperior() {
   const [expandido, setExpandido] = useState(false);
   useLocation();
   const navigate = useNavigate();
-  let usuario;
-  try { usuario = JSON.parse(sessionStorage.getItem("usuario")); } catch { usuario = null; }
-  const salir = () => { sessionStorage.removeItem("usuario"); navigate("/login"); };
+  const usuario = useUsuario();
+  const [error, setError] = useState('');
+  const salir = async () => {
+    try { await cerrarSesion(); navigate('/login'); }
+    catch (e) { setError(e.message); }
+  };
   return (
     <Navbar expand="lg" expanded={expandido} onToggle={setExpandido} variant="dark" className="navbar-biker">
       <Container>
+        {error && <p role="alert" className="text-white">{error}</p>}
         <Navbar.Brand as={Link} to="/">
           <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcT5pjgqI8KZT4oPyWYDkjK8U14IbxiXeRyqSHTZCyQbVw&s=10" alt="" className="brand-logo" />
           Zona Bikers

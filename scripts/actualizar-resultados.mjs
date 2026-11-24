@@ -10,7 +10,10 @@ const coberturaFrontend = await leer('coverage/frontend/coverage-summary.json');
 const coberturaServidor = await leer('coverage/server/coverage-summary.json');
 const originales = await leer('docs/casos-originales.json');
 const casos = informe => informe.testResults.flatMap(archivo => archivo.assertionResults);
-const normalizar = nombre => nombre.replace('Karma + Jasmine', 'Vitest + Chromium').replace(/\s+/g, ' ').trim();
+// Equivalencia explícita del escenario que pasó del JSON local a la API en Evaluación 3.
+const normalizar = nombre => nombre.replace('Karma + Jasmine', 'Vitest + Chromium')
+  .replace('pide los datos a la ruta data/productos.json', 'pide los datos a la API REST de productos')
+  .replace(/\s+/g, ' ').trim();
 
 for (const informe of [frontend, servidor]) {
   if (!informe.success || informe.numFailedTests || informe.numPendingTests || informe.numTodoTests
@@ -79,7 +82,7 @@ Generado por \`npm test\`. Última ejecución: ${fecha} (America/Santiago).
 - Vitest ${metadata.versiones.vitest}, Playwright ${metadata.versiones.playwright}, Node ${metadata.versiones.node}.
 - Frontend: **${frontend.numPassedTests}/${frontend.numTotalTests} casos pasaron** en **Chromium ${versionChromium} headless**. No se usa Edge, Chrome instalado ni jsdom.
 - Servidor: **${servidor.numPassedTests}/${servidor.numTotalTests} casos pasaron** en Vitest con Node.
-- Se conservaron los ${conservados.frontend} casos originales del frontend y los ${conservados.servidor} del servidor. Se verifica su identidad contra \`casos-originales.json\`; solo se renombra el grupo inicial Karma + Jasmine a Vitest + Chromium.
+- Se conservaron los ${conservados.frontend} escenarios originales del frontend y los ${conservados.servidor} del servidor. Se verifica su identidad contra \`casos-originales.json\`; se normalizan el nombre del runner y el escenario de carga de productos, ahora mediante API REST. Las pruebas de persistencia y sesión se adaptaron al contrato HTTP de Evaluación 3.
 - Sin casos omitidos ni pendientes. Un caso frontend verifica la configuración; los otros cubren comportamiento de la aplicación.
 
 ## Cobertura del frontend

@@ -1,6 +1,6 @@
-# Zona Bikers — React
+# Zona Bikers — Evaluación 3, Full Stack II
 
-Migración de Zona Bikers a React para DSY1104, Evaluación Parcial 2. Las pruebas funcionales usan **Vitest con Chromium real**, según la indicación del profesor. El frontend de la tienda persiste sus datos en el navegador; el servidor Node existente atiende el chat.
+React + API REST Spring Boot + MySQL. Se mantiene el diseño, catálogo, ofertas, carrito y chat de Zona Bikers. Los productos, usuarios, sesiones y pedidos se persisten en el servidor. El pago sigue siendo una **simulación sin cobros**.
 
 ## Equipo
 
@@ -8,115 +8,158 @@ Migración de Zona Bikers a React para DSY1104, Evaluación Parcial 2. Las prueb
 - Víctor Salas: estructura e integración.
 - Kevin Valdes: lógica y validaciones.
 
-La entrega es de equipo y cada estudiante defiende individualmente sus decisiones y pruebas. Consultar [entregables y pendientes](docs/ENTREGA.md).
+## Requisitos
 
-Productos permite combinar categoría y búsqueda por nombre. El menú Ofertas muestra descuentos de demostración administrables desde el formulario de productos. El precio se conserva a través de carrito, checkout y pedido. Ver [reglas de precio, compatibilidad y archivos](docs/CATEGORIAS_OFERTAS.md).
+- Node.js y npm compatibles con el package-lock (verificado con Node 26.7.0).
+- **JDK 21**, `JAVA_HOME` apuntando a su carpeta.
+- MySQL local, puerto 3306 (Laragon). Base creada: `zona_bikers`.
+- Backend en **Backend/**, artifact `zona-bikers-backend`, paquete real `cl.duoc.zonabikers`.
+- Spring Boot **4.2.0**, springdoc **3.2.1**. No copiar las dependencias Boot 3 de los ejemplos del profesor.
 
-## Instalar y abrir
+## MySQL y backend
 
-Requiere Node.js 24 LTS y npm. Abrir en VS Code la carpeta que contiene package.json:
+Si la base aún no existe, ejecutar en MySQL:
+
+```sql
+CREATE DATABASE IF NOT EXISTS zona_bikers CHARACTER SET utf8mb4;
+```
+
+Copiar `Backend/.env.example` a `Backend/.env.local` y completar:
+
+| Variable | Uso |
+|---|---|
+| `DB_URL` | `jdbc:mysql://127.0.0.1:3306/zona_bikers` |
+| `DB_USERNAME`, `DB_PASSWORD` | Credenciales de MySQL; Laragon local puede usar root y contraseña vacía. |
+| `JWT_SECRET` | Secreto aleatorio de al menos 32 bytes, obligatorio. |
+| `JWT_MINUTES` | Duración de sesión, 60 por defecto; entre 1 y 1440. |
+| `ADMIN_EMAIL`, `ADMIN_PASSWORD` | Creación inicial opcional de administrador. No modifica una cuenta existente. Correo @duoc.cl, @profesor.duoc.cl o @gmail.com; contraseña de 8 caracteres como mínimo, hasta 72 bytes. |
+| `FRONTEND_ORIGINS` | Orígenes CORS exactos separados por coma; localhost:5173 y 127.0.0.1:5173 por defecto. |
+| `SERVER_PORT` | 8080 por defecto. |
+| `SEED_CATALOG` | true carga los cuatro productos originales si la tabla está vacía. Poner false después de la primera carga si se desea mantener un catálogo vacío. |
+
+Generar un secreto local, copiarlo a `JWT_SECRET` y no compartirlo:
+
+```powershell
+node -e "console.log(require('node:crypto').randomBytes(48).toString('base64'))"
+```
+
+Arrancar desde la raíz:
+
+```powershell
+$env:JAVA_HOME = 'RUTA_A_TU_JDK_21'
+powershell -ExecutionPolicy Bypass -File Backend/run.ps1
+```
+
+El script lee `Backend/.env.local` sin ejecutar su contenido y lanza el Maven Wrapper. Como alternativa, definir las variables en el entorno/IDE y ejecutar `Backend/mvnw.cmd -f Backend/pom.xml spring-boot:run`. Spring Boot por sí solo **no lee archivos .env**.
+
+Comprobar `http://localhost:8080/api/prueba`. Hibernate crea las tablas mediante `ddl-auto=update`; esta configuración está destinada al desarrollo local. Para un entorno productivo serían necesarias migraciones versionadas y HTTPS.
+
+Los archivos .env.local, logs y target están ignorados por Git. No poner secretos en variables `VITE_`. Después de crear el administrador se pueden retirar ADMIN_EMAIL y ADMIN_PASSWORD del entorno; la cuenta y su hash permanecen en MySQL. No hay contraseñas predeterminadas en el código.
+
+## Frontend y chat
+
+En otra terminal, desde la raíz:
 
 ```powershell
 npm ci
-npm run test:browser:install
 npm run dev
 ```
 
-Abrir la URL que muestra Vite; no abrir index.html con doble clic. Los JSON se cargan por HTTP. Playwright descarga Chromium una vez por equipo; no se depende de Chrome o Edge instalados.
+Por defecto React usa `http://localhost:8080/api`. Para cambiarlo, copiar `.env.example` a `.env.local` en la raíz y configurar `VITE_API_URL`. Reiniciar Vite tras editar variables.
 
-## Pruebas y cobertura
+Abrir la URL que indica Vite. Se conserva HashRouter: por ejemplo `http://localhost:5173/#/login`. Si Vite cambia de puerto, agregar ese origen a FRONTEND_ORIGINS y reiniciar Spring Boot.
+
+El chat sigue usando `server/chat.js`: Vite conserva su middleware `/api/chat`, independiente de la API de negocio. Para ejecutar el servidor Node separado: `npm run server`. Configurar GEMINI_API_KEY únicamente en el entorno del servidor o .env.local de la raíz. Ver [configuración del chat](docs/chat-gemini.md). Las pruebas del chat no llaman a Google ni necesitan una clave.
+
+## Permisos y sesión
+
+| Acción | Visitante | Cliente | Vendedor | Administrador |
+|---|---|---|---|---|
+| Consultar catálogo/ofertas y preparar carrito | Sí | Sí | Sí | Sí |
+| Registro público | Solo crea cliente | Solo crea cliente | Solo crea cliente | Solo crea cliente |
+| Crear y consultar pedidos propios | No | Sí | Sí | Sí |
+| Crear/editar/eliminar productos | No | No | Sí | Sí |
+| CRUD de usuarios y asignación de roles | No | No | No | Sí |
+| Importación de datos locales antiguos | No | No | No | Sí |
+
+La API aplica las restricciones independientemente del navegador. Las contraseñas se guardan con BCrypt y nunca aparecen en respuestas. El registro público rechaza roles privilegiados.
+
+React persiste token, vencimiento y perfil en `sesionBikers`; no guarda contraseñas. La sesión sobrevive a recargas y cierres del navegador hasta expirar. El servidor verifica firma, emisor, expiración, sesión vigente y usuario actual. Logout revoca la sesión en MySQL; editar una cuenta invalida sus sesiones. Un 401 limpia la sesión de React. El administrador no puede eliminarse ni cambiar su propio rol.
+
+## Migración y compra
+
+El catálogo inicial se copia desde `Backend/src/main/resources/catalogo-inicial.json`. Los JSON de noticias/equipo siguen siendo recursos estáticos.
+
+Los datos antiguos de localStorage **no autorizan acceso ni se usan como catálogo activo**. En el mismo navegador que contiene `productosBikers` o `usuariosBikers`, iniciar sesión como administrador y abrir el panel. La sección de importación:
+
+- Importa nuevos códigos y correos usando la API protegida.
+- No sobrescribe registros existentes; muestra los conflictos para resolverlos desde los formularios.
+- Solicita una contraseña nueva para las cuentas importadas y no envía las antiguas.
+- Retira de las listas antiguas únicamente los registros importados con éxito; conserva fallos para reintentar.
+
+El carrito continúa en localStorage para poder prepararlo sin sesión. Al confirmar se exige login y se vuelve al checkout. El navegador envía IDs y cantidades, nunca precios como autoridad. El servidor valida datos, entrega, región/comuna, stock y cantidades; aplica la oferta vigente y calcula despacho ($3.990) o retiro ($0).
+
+Una compra simulada aprobada guarda pedido y líneas históricas y descuenta stock en una transacción. Una rechazada guarda el resultado sin descontar ni vaciar el carrito. Los bloqueos impiden sobreventa concurrente; la clave de intento evita duplicados al reintentar una solicitud desde el checkout. Los pedidos solo pueden leerse por su propietario, incluso si quien consulta es administrador.
+
+El resumen previo del carrito es orientativo: el total definitivo usa los precios vigentes del servidor. No se integró pasarela de pago, despacho real ni envío de correos. Los pedidos antiguos del navegador no se importan como ventas. No se necesita EC2; el video de defensa sigue pendiente.
+
+## Swagger y pruebas manuales
+
+Abrir [Swagger UI local](http://localhost:8080/swagger-ui/index.html). OpenAPI JSON: `/v3/api-docs`.
+
+1. Consultar GET /api/prueba y GET /api/productos sin token.
+2. Registrar un cliente en POST /api/auth/registro.
+3. Hacer login en POST /api/auth/login y copiar solo el campo token.
+4. En **Authorize**, pegar el JWT (sin escribir Bearer) y probar GET /api/auth/me.
+5. Con cliente, POST /api/productos y GET /api/usuarios deben devolver 403.
+6. Con vendedor, probar CRUD de productos; usuarios debe seguir devolviendo 403.
+7. Con administrador, probar CRUD de usuarios y productos. No se devuelven hashes.
+8. Crear un pedido, consultar su ID y comprobar stock; probar cantidades inválidas, falta de stock y otro propietario.
+9. Cerrar sesión con POST /api/auth/logout; reutilizar ese token debe devolver 401.
+
+Ver [guion completo, cuerpos de ejemplo y evidencias](docs/EVALUACION_3.md).
+
+## Verificación automatizada
 
 ```powershell
+npm run test:browser:install
 npm test
+npm run lint
+npm run build
+Backend/mvnw.cmd -f Backend/pom.xml test
+Backend/mvnw.cmd -f Backend/pom.xml package
 ```
 
-Ejecuta los **142 casos del frontend** (incluidos los 120 originales, 10 del checkout y 12 de categorías/ofertas) en Vitest Browser Mode con **Chromium headless de Playwright** y los **seis del servidor** con Vitest en Node. Si todo pasa, comprueba que se mantengan los casos originales y actualiza resultados y documentos de cobertura.
+- Vitest: 149 casos frontend en Chromium y 6 del chat; incluye los escenarios anteriores adaptados al contrato HTTP y 7 nuevos de sesión/importación. Los dobles HTTP prueban la UI; no se presentan como prueba del servidor.
+- JUnit: 14 casos con servidor HTTP real y H2 aislada, incluyendo CRUD, BCrypt, JWT, roles, CORS, Swagger, stock y concurrencia. Nunca borran zona_bikers.
+- Se mantienen umbrales de cobertura frontend: 90% sentencias/funciones/líneas y 85% ramas.
+- `npm test` actualiza resultados y cobertura en docs. [Resultados Vitest](docs/RESULTADOS.md).
+- JUnit genera `Backend/target/surefire-reports/`.
 
-| Comando | Uso |
-|---|---|
-| `npm run test:browser:install` | Instalar Chromium. |
-| `npm test` | Ambas suites, cobertura y documentación de resultados. |
-| `npm run test:frontend` | Solo navegador y su cobertura. |
-| `npm run test:chat` | Solo servidor y su cobertura. |
-| `npm run test:coverage` | Alias del recorrido completo de npm test. |
-| `npm run test:watch` | Reejecutar frontend al cambiar archivos. |
-| `npm run lint` | Comprobar el código. |
-| `npm run build` | Compilar para producción. |
-| `npm run preview` | Abrir la compilación local. |
+Prueba integral opcional (requiere JAR generado, MySQL local y Chromium):
 
-Los comandos parciales generan su JSON y cobertura; para actualizar los documentos consolidados usar `npm test`.
+```powershell
+node scripts/verificar-integracion.mjs
+```
 
-- [Plan de pruebas](docs/PLAN_PRUEBAS.md).
-- [Resultados actuales y todos los casos](docs/RESULTADOS.md).
-- [Documento de cobertura y análisis](docs/COBERTURA.md).
-- [Cambios de migración](docs/MIGRACION_VITEST.md).
-- Informes HTML: `coverage/frontend/index.html` y `coverage/server/index.html`.
-- JSON: `docs/resultados-vitest-chromium.json`, `docs/resultados-vitest-servidor.json` y `docs/resultados-migracion.json`.
+Usa JAVA_HOME, DB_USERNAME y DB_PASSWORD del entorno. MYSQL_BIN permite indicar otra ruta del cliente mysql.exe. Crea una base aleatoria `zona_bikers_test_*` y la elimina al terminar; requiere permisos para crear bases. Inicia servicios en 18080 y 15173, los cierra al finalizar y no modifica zona_bikers. La evidencia se guarda en `docs/evaluacion3-integracion.json`, sin secretos. Captura local: `test-results/checkout-mysql.png`.
 
-La cobertura del frontend incluye JS/JSX de src, excluyendo pruebas, setup y main.jsx. Mantiene umbrales globales de 90% para sentencias, funciones y líneas y 85% para ramas. El servidor se mide por separado; no tenía un umbral previo. CSS, recursos externos y arranque HTTP no se presentan como cubiertos. La comprobación inicial de 1 + 1 se mantiene separada de los casos funcionales.
-
-Los resultados anteriores de Jasmine/Karma se conservan en `docs/historico/jasmine-karma/`. No son resultados de Vitest ni se usan como cobertura vigente. No se necesitan Karma, Jasmine, webpack ni Babel para las pruebas migradas.
-
-## Funciones y límites
-
-- Catálogo, inicio, detalle y relacionados desde JSON.
-- Carrito con cantidades enteras, límite de stock, total y persistencia.
-- Registro local, login, cierre de sesión y rutas según rol.
-- CRUD de productos compartido con el catálogo y CRUD de cuentas compartido con el login.
-- Equipo, noticias, módulos, menú adaptable, etiquetas, foco y salto al contenido.
-- Chat Biker IA: [configuración del componente y servidor](docs/chat-gemini.md).
-
-Productos, cuentas y carrito usan localStorage; las ediciones no reescriben los JSON. Otro navegador conserva sus propios datos. La compra es simulada: no cobra, registra pedidos ni descuenta inventario. El contacto valida sin enviar correos. El servidor atiende el chat, no el negocio de la tienda. Las pruebas usan respuestas simuladas, sin claves ni llamadas a Google.
-
-## Cuentas de prueba
-
-| Rol | Correo | Contraseña |
-|---|---|---|
-| Administrador | admin@duoc.cl | 12345 |
-| Vendedor | vende@profesor.duoc.cl | vende |
-| Cliente | cliente@gmail.com | moto1 |
-
-Usar datos ficticios: las cuentas educativas se guardan en el navegador y las rutas no sustituyen la autenticación de producción. Para restaurar los datos iniciales, borrar las claves productosBikers, usuariosBikers y carritoBikers del almacenamiento de este navegador.
-
-## Ejemplos
-
-1. Agregar dos unidades y comprobar el total; superar el stock debe mostrar un error sin aumentar la cantidad.
-2. Registrar una cuenta ficticia e iniciar sesión con ella en el mismo navegador.
-3. Como administrador, crear y editar un producto, volver al catálogo y recargar: debe mantenerse el cambio.
-4. Revisar noticias, fechas, menú móvil y navegación con teclado.
-
-## Estructura
+## Estructura y referencias
 
 ```text
-src/components/        componentes React
-src/pages/             rutas y formularios
-src/context/           carrito compartido
-src/utils/             datos, catálogo, cuentas y validaciones
-src/test/setup.js      limpieza entre casos
-public/data/           JSON inicial
-server/                API del chat y casos Vitest en Node
-scripts/               actualización automática de resultados
-docs/                  plan, cobertura y evidencia
-coverage/frontend/     informe del navegador
-coverage/server/       informe del servidor
-vitest.config.js       Chromium Browser Mode con Playwright
-vitest.server.config.js Vitest en Node
+Backend/src/main/java/cl/duoc/zonabikers/
+  api/          controladores, DTO y errores
+  model/        entidades persistentes
+  repository/   Spring Data JPA
+  service/      reglas y transacciones
+  security/     JWT, sesiones y permisos
+  config/       Swagger y datos iniciales
+src/pages/      pantallas React existentes
+src/utils/      cliente HTTP, sesión, catálogo, cuentas, pedidos
+server/         chat Node existente
+docs/           evidencias y guiones
 ```
 
-## GitHub y publicación opcional
+Referencias revisadas: [BackEnd-productos del profesor](https://github.com/marihuertas-ui/CarritoCompra-react/tree/main/BackEnd-productos/productos), [carrito-JWT](https://github.com/marihuertas-ui/CarritoCompra-react/tree/main/carrito-JWT/carrito-JWT) y [compatibilidad springdoc](https://springdoc.org/#what-is-the-compatibility-matrix-of-springdoc-openapi-with-spring-boot).
 
-El flujo .github/workflows/pages.yml instala dependencias y Chromium con sus bibliotecas de Linux, comprueba el código, ejecuta ambas suites y compila. Conserva resultados y cobertura como artefactos. Usa HashRouter y base relativa para recargar rutas internas. Falta asociar el repositorio real y verificar la URL pública; esta migración no publica cambios. GitHub Pages es opcional en la pauta y no ejecuta el servidor del chat.
-
-## Capturas existentes
-
-Las capturas de interfaz recibidas se conservan como referencia, no como una nueva revisión visual de esta migración.
-
-![Inicio](docs/capturas/inicio-escritorio.png)
-![Menú móvil](docs/capturas/menu-movil.png)
-
-La captura antigua de cobertura pertenece a Jasmine/Karma; consultar los informes HTML actuales. La cobertura de componentes no sustituye una revisión visual en dispositivos reales.
-
-
-## Cierre colaborativo
-
-Ver [reparto en tres partes](docs/PLAN_COLABORACION.md) y [pendientes verificados](docs/CHECKLIST_CIERRE.md). El repositorio remoto todavía está pendiente de creación. La verificación de pull requests está separada de la publicación manual opcional en Pages.
+El workflow de Pages existente no despliega Spring Boot ni MySQL. No se ha publicado ni hecho push. Los documentos de Evaluación 2 se conservan como antecedentes; el alcance vigente es este README y EVALUACION_3.md.

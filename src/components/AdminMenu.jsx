@@ -3,6 +3,7 @@ import { useState } from 'react';
 import Navbar from "react-bootstrap/Navbar";
 import Nav from "react-bootstrap/Nav";
 import Container from "react-bootstrap/Container";
+import { useUsuario } from '../utils/sesion';
 
 /**
  * Barra de navegación del panel de administración.
@@ -12,6 +13,7 @@ import Container from "react-bootstrap/Container";
  * @returns {JSX.Element} Barra de navegación del administrador.
  */
 function AdminMenu() {
+  const usuario = useUsuario();
   const [expandido, setExpandido] = useState(false);
   return (
     <Navbar expand="lg" expanded={expandido} onToggle={setExpandido} variant="dark" className="navbar-admin mb-4">
@@ -22,7 +24,7 @@ function AdminMenu() {
           <Nav className="ms-auto">
             <Nav.Link as={NavLink} to="/admin" end>Inicio</Nav.Link>
             <Nav.Link as={NavLink} to="/admin-productos">Productos</Nav.Link>
-            <Nav.Link as={NavLink} to="/admin-usuarios">Usuarios</Nav.Link>
+            {usuario?.rol === 'administrador' && <Nav.Link as={NavLink} to="/admin-usuarios">Usuarios</Nav.Link>}
             <Nav.Link as={NavLink} to="/">Volver a la tienda</Nav.Link>
           </Nav>
         </Navbar.Collapse>

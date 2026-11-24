@@ -1,11 +1,11 @@
 {
-  "fechaUTC": "2026-10-23T06:48:27.694Z",
+  "fechaUTC": "2026-11-24T06:30:35.715Z",
   "zonaHoraria": "America/Santiago",
   "herramienta": "Vitest",
   "versiones": {
     "vitest": "5.0.5",
     "playwright": "1.64.1",
-    "node": "v24.19.0",
+    "node": "v26.7.0",
     "chromium": "156.0.8078.4"
   },
   "entorno": {
@@ -13,7 +13,7 @@
     "servidor": "Node.js"
   },
   "casos": {
-    "frontend": 142,
+    "frontend": 149,
     "servidor": 6
   },
   "casosOriginalesConservados": {
@@ -23,28 +23,28 @@
   "cobertura": {
     "frontend": {
       "lines": {
-        "total": 542,
-        "covered": 536,
+        "total": 632,
+        "covered": 623,
         "skipped": 0,
-        "pct": 98.89
+        "pct": 98.57
       },
       "statements": {
-        "total": 674,
-        "covered": 664,
+        "total": 795,
+        "covered": 780,
         "skipped": 0,
-        "pct": 98.51
+        "pct": 98.11
       },
       "functions": {
-        "total": 188,
-        "covered": 187,
+        "total": 210,
+        "covered": 207,
         "skipped": 0,
-        "pct": 99.46
+        "pct": 98.57
       },
       "branches": {
-        "total": 464,
-        "covered": 449,
+        "total": 525,
+        "covered": 503,
         "skipped": 0,
-        "pct": 96.76
+        "pct": 95.8
       },
       "branchesTrue": {
         "total": 0,

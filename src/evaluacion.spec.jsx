@@ -1,3 +1,4 @@
+import { simularApi, sesionPrueba } from './test/apiSimulada';
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import { render, screen, fireEvent, waitFor, cleanup, renderHook, act } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
@@ -52,21 +53,11 @@ const proyectos = [{
   tecnologias: ['React'],
   demo: '/productos'
 }];
-function datosJSON() {
-  vi.spyOn(window, 'fetch').mockImplementation(url => Promise.resolve({
-    ok: true,
-    json: () => Promise.resolve(String(url).includes('noticias') ? noticias : String(url).includes('equipo') ? equipo : String(url).includes('proyectos') ? proyectos : [producto])
-  }));
-}
+function datosJSON() { return simularApi([producto], { noticias, equipo, proyectos }); }
 function abrir(ruta = '/') {
   return render(<MemoryRouter initialEntries={[ruta]}><CarritoProvider><App /></CarritoProvider></MemoryRouter>);
 }
-function sesion(rol = 'administrador') {
-  sessionStorage.setItem('usuario', JSON.stringify({
-    correo: 'admin@duoc.cl',
-    rol
-  }));
-}
+function sesion(rol = 'administrador') { sesionPrueba(rol); }
 function escribir(etiqueta, valor) {
   fireEvent.change(screen.getByLabelText(etiqueta), {
     target: {
@@ -82,6 +73,7 @@ function enviar(nombre) {
 beforeEach(() => {
   localStorage.clear();
   sessionStorage.clear();
+  datosJSON();
 });
 afterEach(() => cleanup());
 describe('Validaciones y límites', () => {
@@ -93,8 +85,8 @@ describe('Validaciones y límites', () => {
   });
   for (const rut of ['', '12', '12.345.678-5', 'abcdefgh', '123456789012', '12345K']) it(`rechaza RUN ${rut}`, () => expect(validarRut(rut)).toBe(false));
   it('exige credenciales', () => expect(Object.keys(validarLogin('', '')).length).toBe(2));
-  it('acepta credenciales válidas', () => expect(validarLogin('a@gmail.com', '12345')).toEqual({}));
-  it('rechaza credenciales largas', () => expect(Object.keys(validarLogin('a'.repeat(101) + '@gmail.com', '1'.repeat(11))).length).toBe(2));
+  it('acepta credenciales válidas', () => expect(validarLogin('a@gmail.com', 'Prueba123')).toEqual({}));
+  it('rechaza credenciales largas', () => expect(Object.keys(validarLogin('a'.repeat(101) + '@gmail.com', '1'.repeat(73))).length).toBe(2));
   it('rechaza dominio y contraseña corta', () => expect(Object.keys(validarLogin('a@example.com', '1')).length).toBe(2));
   const registro = {
     run: '123456785',
@@ -174,23 +166,23 @@ describe('Persistencia y catálogo', () => {
     await eliminarProducto(1);
     expect(await cargarProductos()).toEqual([]);
   });
-  it('crea, normaliza, modifica y elimina cuentas', () => {
-    guardarUsuario({
+  it('crea, normaliza, modifica y elimina cuentas', async () => {
+    await guardarUsuario({
       correo: 'NUEVO@GMAIL.COM',
-      contrasena: '12345',
+      contrasena: 'Prueba123',
       rol: 'cliente'
     });
-    expect(obtenerUsuarios().at(-1).correo).toBe('nuevo@gmail.com');
-    expect(() => guardarUsuario({
+    expect((await obtenerUsuarios()).at(-1).correo).toBe('nuevo@gmail.com');
+    await expect(guardarUsuario({
       correo: 'nuevo@gmail.com'
-    })).toThrow();
-    guardarUsuario({
+    })).rejects.toThrow();
+    await guardarUsuario({
       correo: 'cambio@gmail.com',
       rol: 'cliente'
-    }, 'nuevo@gmail.com');
-    expect(obtenerUsuarios().at(-1).correo).toBe('cambio@gmail.com');
-    eliminarUsuario('cambio@gmail.com');
-    expect(obtenerUsuarios().length).toBe(3);
+    }, 4);
+    expect((await obtenerUsuarios()).at(-1).correo).toBe('cambio@gmail.com');
+    await eliminarUsuario(4);
+    expect((await obtenerUsuarios()).length).toBe(3);
   });
 });
 describe('Carrito: casos de error y stock', () => {
@@ -285,15 +277,15 @@ describe('Navegación, contenido y acceso', () => {
       name: 'Iniciar sesión'
     })).toBeTruthy();
   });
-  it('muestra el panel y cierra sesión', () => {
+  it('muestra el panel y cierra sesión', async () => {
     sesion();
     abrir('/admin');
     expect(screen.getByRole('heading', {
       name: 'Panel de administración'
     })).toBeTruthy();
     enviar('Cerrar sesión');
-    expect(sessionStorage.getItem('usuario')).toBeNull();
-    expect(screen.getByRole('heading', {
+    await waitFor(() => expect(localStorage.getItem('sesionBikers')).toBeNull());
+    expect(await screen.findByRole('heading', {
       name: 'Iniciar sesión'
     })).toBeTruthy();
   });
@@ -319,22 +311,22 @@ describe('Navegación, contenido y acceso', () => {
   });
 });
 describe('Formularios públicos', () => {
-  it('valida login vacío y rechaza credenciales incorrectas', () => {
+  it('valida login vacío y rechaza credenciales incorrectas', async () => {
     abrir('/login');
     enviar('Entrar');
     expect(screen.getByText('El correo es requerido.')).toBeTruthy();
     escribir('Correo', 'admin@duoc.cl');
-    escribir('Contraseña', 'xxxx');
+    escribir('Contraseña', 'incorrecta');
     enviar('Entrar');
-    expect(screen.getByText('El correo o la contraseña son incorrectos.')).toBeTruthy();
+    expect(await screen.findByText('El correo o la contraseña son incorrectos.')).toBeTruthy();
   });
-  it('inicia sesión como administrador', () => {
+  it('inicia sesión como administrador', async () => {
     vi.spyOn(window, 'alert').mockImplementation(() => {});
     abrir('/login');
     escribir('Correo', 'ADMIN@DUOC.CL');
-    escribir('Contraseña', '12345');
+    escribir('Contraseña', 'Prueba123');
     enviar('Entrar');
-    expect(screen.getByRole('heading', {
+    expect(await screen.findByRole('heading', {
       name: 'Panel de administración'
     })).toBeTruthy();
   });
@@ -346,24 +338,24 @@ describe('Formularios públicos', () => {
     escribir('Nombre', 'Ana');
     escribir('Apellidos', 'Soto');
     escribir('Correo', 'ana@gmail.com');
-    escribir('Contraseña', '12345');
+    escribir('Contraseña', 'Prueba123');
     escribir('Dirección', 'Calle 1');
     escribir('Región', 'Región Metropolitana');
     escribir('Comuna', 'Santiago');
     escribir('Región', 'Región de Valparaíso');
     expect(screen.getByLabelText('Comuna').value).toBe('');
     enviar('Registrarme');
-    expect(obtenerUsuarios().find(u => u.correo === 'ana@gmail.com')).toBeTruthy();
+    await waitFor(async () => expect((await obtenerUsuarios()).find(u => u.correo === 'ana@gmail.com')).toBeTruthy());
     cleanup();
     abrir('/login');
     escribir('Correo', 'ana@gmail.com');
-    escribir('Contraseña', '12345');
+    escribir('Contraseña', 'Prueba123');
     enviar('Entrar');
     expect(await screen.findByRole('heading', {
       name: 'Zona Bikers'
     })).toBeTruthy();
   });
-  it('no registra campos vacíos ni un correo repetido', () => {
+  it('no registra campos vacíos ni un correo repetido', async () => {
     abrir('/registro');
     enviar('Registrarme');
     expect(screen.getByText('El RUN es requerido.')).toBeTruthy();
@@ -371,10 +363,10 @@ describe('Formularios públicos', () => {
     escribir('Nombre', 'Ana');
     escribir('Apellidos', 'Soto');
     escribir('Correo', 'admin@duoc.cl');
-    escribir('Contraseña', '12345');
+    escribir('Contraseña', 'Prueba123');
     escribir('Dirección', 'Calle 1');
     enviar('Registrarme');
-    expect(screen.getByText('Ya existe una cuenta con ese correo.')).toBeTruthy();
+    expect(await screen.findByText('Ya existe una cuenta con ese correo.')).toBeTruthy();
   });
   it('valida y limpia el contacto explicando su alcance', () => {
     vi.spyOn(window, 'alert').mockImplementation(() => {});
@@ -416,7 +408,7 @@ describe('Detalle y pantalla del carrito', () => {
   });
   it('renderiza relacionados y fallback de id', async () => {
     vi.spyOn(window, 'fetch').mockReturnValue(Promise.resolve({
-      json: () => Promise.resolve([producto, {
+      ok: true, json: () => Promise.resolve([producto, {
         ...producto,
         id: 2,
         nombre: 'Guantes'
@@ -428,6 +420,7 @@ describe('Detalle y pantalla del carrito', () => {
     })).toBeTruthy();
   });
   it('modifica, cancela vaciado, elimina y finaliza compra simulada', () => {
+    sesion('cliente');
     vi.spyOn(window, 'confirm').mockReturnValue(false);
     vi.spyOn(window, 'alert').mockImplementation(() => {});
     localStorage.setItem('carritoBikers', JSON.stringify([{
@@ -514,33 +507,34 @@ describe('Administración persistente', () => {
     expect(screen.getByText('El nombre es requerido.')).toBeTruthy();
     escribir('Nombre', 'Persona de prueba');
     escribir('Correo', 'persona@gmail.com');
-    escribir('Contraseña', '12345');
+    escribir('Contraseña', 'Prueba123');
     escribir('Rol', 'vendedor');
     enviar('Guardar usuario');
     expect(await screen.findByText('persona@gmail.com')).toBeTruthy();
-    expect(obtenerUsuarios().at(-1).rol).toBe('vendedor');
+    expect((await obtenerUsuarios()).at(-1).rol).toBe('vendedor');
   });
   it('edita una cuenta y elimina con confirmación', async () => {
     vi.spyOn(window, 'confirm').mockReturnValueOnce(false).mockReturnValueOnce(true);
-    abrir('/admin-nuevo-usuario?correo=cliente%40gmail.com');
+    abrir('/admin-nuevo-usuario?id=3');
+    await screen.findByLabelText('Nombre');
     escribir('Nombre', 'Cliente actualizado');
     enviar('Guardar usuario');
     expect(await screen.findByText('Cliente actualizado')).toBeTruthy();
     enviar('Eliminar cliente@gmail.com');
     expect(screen.getByText('Cliente actualizado')).toBeTruthy();
     enviar('Eliminar cliente@gmail.com');
-    expect(screen.queryByText('Cliente actualizado')).toBeNull();
+    await waitFor(() => expect(screen.queryByText('Cliente actualizado')).toBeNull());
   });
-  it('impide correos duplicados', () => {
+  it('impide correos duplicados', async () => {
     abrir('/admin-nuevo-usuario');
     escribir('Nombre', 'Otra persona');
     escribir('Correo', 'admin@duoc.cl');
-    escribir('Contraseña', '12345');
+    escribir('Contraseña', 'Prueba123');
     enviar('Guardar usuario');
-    expect(screen.getByText('Ya existe una cuenta con ese correo.')).toBeTruthy();
+    expect(await screen.findByText('Ya existe una cuenta con ese correo.')).toBeTruthy();
   });
-  it('informa usuario inexistente', () => {
-    abrir('/admin-nuevo-usuario?correo=nadie');
-    expect(screen.getByText('Usuario no encontrado.')).toBeTruthy();
+  it('informa usuario inexistente', async () => {
+    abrir('/admin-nuevo-usuario?id=999');
+    expect(await screen.findByText('Usuario no encontrado.')).toBeTruthy();
   });
 });

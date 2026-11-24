@@ -14,9 +14,10 @@ export default function Checkout() {
   const [error, setError] = useState('');
   const [estado, setEstado] = useState('aprobada');
   const ocupado = useRef(false);
+  const intento = useRef({});
   const navigate = useNavigate();
   const cambiar = ({ target: { name, value } }) => setDatos(anterior => ({ ...anterior, [name]: value, ...(name === 'region' ? { comuna: '' } : {}) }));
-  const confirmar = evento => {
+  const confirmar = async evento => {
     evento.preventDefault();
     if (ocupado.current || !carrito.length) return;
     const validacion = validarCompra(datos);
@@ -24,16 +25,18 @@ export default function Checkout() {
     if (Object.keys(validacion).length) return;
     ocupado.current = true;
     try {
-      const pedido = guardarPedido(carrito, datos, estado);
-      if (estado === 'aprobada') vaciar();
+      const firma = JSON.stringify({ productos: carrito.map(({ id, cantidad }) => ({ id, cantidad })), datos, estado });
+      if (intento.current.firma !== firma) intento.current = { firma, clave: crypto.randomUUID() };
+      const pedido = await guardarPedido(carrito, datos, estado, intento.current.clave);
+      if (pedido.estado === 'aprobada') vaciar();
       navigate(`/compra/${pedido.id}`, { replace: true });
-    } catch {
-      setError('No se pudo guardar el pedido. Tu carrito se conserva; vuelve a intentarlo.');
+    } catch (e) {
+      setError(e.message + ' Tu carrito se conserva; vuelve a intentarlo.');
       ocupado.current = false;
     }
   };
   if (!carrito.length) return <section><h1>Checkout</h1><p>Tu carrito está vacío.</p><Link to="/productos">Ver productos</Link></section>;
-  return <section><h1>Checkout</h1><p>Compra de demostración, sin pagos ni pedidos reales.</p>
+  return <section><h1>Checkout</h1><p>Pago simulado, sin cobros. El pedido se guarda y una compra aprobada descuenta stock. El servidor confirma los precios vigentes.</p>
     <Row><Col md={6}><Form noValidate onSubmit={confirmar}>
       {['nombre', 'correo', 'direccion'].map((campo, i) => <CampoFormulario key={campo} id={campo} etiqueta={['Nombre', 'Correo', 'Dirección'][i]} tipo={campo === 'correo' ? 'email' : 'text'} valor={datos[campo]} onChange={cambiar} error={errores[campo]} />)}
       {['region', 'comuna', 'entrega'].map((campo, i) => <Form.Group key={campo} controlId={campo} className="mb-3">
