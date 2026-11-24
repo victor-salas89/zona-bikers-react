@@ -62,7 +62,7 @@ En otra terminal, desde la raíz:
 
 ```powershell
 npm ci
-npm run dev
+npm.cmd run dev -- --port 5173 --strictPort
 ```
 
 Por defecto React usa `http://localhost:8080/api`. Para cambiarlo, copiar `.env.example` a `.env.local` en la raíz y configurar `VITE_API_URL`. Reiniciar Vite tras editar variables.
@@ -85,6 +85,8 @@ El chat sigue usando `server/chat.js`: Vite conserva su middleware `/api/chat`, 
 La API aplica las restricciones independientemente del navegador. Las contraseñas se guardan con BCrypt y nunca aparecen en respuestas. El registro público rechaza roles privilegiados.
 
 React persiste token, vencimiento y perfil en `sesionBikers`; no guarda contraseñas. La sesión sobrevive a recargas y cierres del navegador hasta expirar. El servidor verifica firma, emisor, expiración, sesión vigente y usuario actual. Logout revoca la sesión en MySQL; editar una cuenta invalida sus sesiones. Un 401 limpia la sesión de React. El administrador no puede eliminarse ni cambiar su propio rol.
+
+La renovación usa `POST /api/auth/refresh` con el JWT vigente. Entrega un JWT nuevo y revoca el anterior dentro de una transacción. React la solicita antes de una operación privada cuando quedan menos de cinco minutos y coordina solicitudes simultáneas. Una sesión inactiva vence; un token vencido, revocado o alterado no permite renovar y requiere iniciar sesión otra vez. Este mecanismo no usa un refresh token separado ni almacena la contraseña.
 
 ## Migración y compra
 
@@ -116,6 +118,7 @@ Abrir [Swagger UI local](http://localhost:8080/swagger-ui/index.html). OpenAPI J
 7. Con administrador, probar CRUD de usuarios y productos. No se devuelven hashes.
 8. Crear un pedido, consultar su ID y comprobar stock; probar cantidades inválidas, falta de stock y otro propietario.
 9. Cerrar sesión con POST /api/auth/logout; reutilizar ese token debe devolver 401.
+10. Con una sesión nueva, ejecutar POST /api/auth/refresh. Debe devolver 200 con un token diferente y vencimiento nuevo. El anterior debe devolver 401 en /api/auth/me; el nuevo debe devolver 200 y conservar los permisos. Cerrar la sesión nueva y comprobar que tampoco permite renovar.
 
 Ver [guion completo, cuerpos de ejemplo y evidencias](docs/EVALUACION_3.md).
 
@@ -130,8 +133,8 @@ Backend/mvnw.cmd -f Backend/pom.xml test
 Backend/mvnw.cmd -f Backend/pom.xml package
 ```
 
-- Vitest: 149 casos frontend en Chromium y 6 del chat; incluye los escenarios anteriores adaptados al contrato HTTP y 7 nuevos de sesión/importación. Los dobles HTTP prueban la UI; no se presentan como prueba del servidor.
-- JUnit: 14 casos con servidor HTTP real y H2 aislada, incluyendo CRUD, BCrypt, JWT, roles, CORS, Swagger, stock y concurrencia. Nunca borran zona_bikers.
+- Vitest: casos frontend en Chromium y del chat en Node, incluidos renovación concurrente y respuestas tardías después de cerrar sesión. Los dobles HTTP prueban la UI; no se presentan como prueba del servidor. Ver conteos de la última ejecución en docs/RESULTADOS.md.
+- JUnit: servidor HTTP real y H2 aislada, incluyendo CRUD, BCrypt, JWT, renovación y revocación, roles, CORS, Swagger, stock y concurrencia. Nunca borran zona_bikers.
 - Se mantienen umbrales de cobertura frontend: 90% sentencias/funciones/líneas y 85% ramas.
 - `npm test` actualiza resultados y cobertura en docs. [Resultados Vitest](docs/RESULTADOS.md).
 - JUnit genera `Backend/target/surefire-reports/`.
@@ -162,4 +165,4 @@ docs/           evidencias y guiones
 
 Referencias revisadas: [BackEnd-productos del profesor](https://github.com/marihuertas-ui/CarritoCompra-react/tree/main/BackEnd-productos/productos), [carrito-JWT](https://github.com/marihuertas-ui/CarritoCompra-react/tree/main/carrito-JWT/carrito-JWT) y [compatibilidad springdoc](https://springdoc.org/#what-is-the-compatibility-matrix-of-springdoc-openapi-with-spring-boot).
 
-El workflow de Pages existente no despliega Spring Boot ni MySQL. No se ha publicado ni hecho push. Los documentos de Evaluación 2 se conservan como antecedentes; el alcance vigente es este README y EVALUACION_3.md.
+El código de la Evaluación 3 está integrado en la rama main. La aplicación se ejecuta localmente; el workflow de GitHub Pages no despliega Spring Boot ni MySQL. Los documentos de Evaluación 2 se conservan como antecedentes; el alcance vigente es este README y docs/EVALUACION_3.md.

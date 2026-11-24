@@ -32,6 +32,7 @@ Los ejemplos del profesor son referencias de estructura, no dependencias copiada
 | POST /api/auth/login | Público, token + expira + usuario; 401 si credenciales incorrectas |
 | GET /api/auth/me | Sesión vigente, perfil sin contraseña |
 | POST /api/auth/logout | Sesión vigente, 204 y revocación |
+| POST /api/auth/refresh | JWT vigente, 200 con token nuevo; revoca el anterior |
 | GET/POST /api/usuarios | Administrador, listado/alta |
 | GET/PUT/DELETE /api/usuarios/{id} | Administrador, lectura/edición/borrado |
 | POST /api/pedidos | Autenticado, 201; transacción e idempotencia |
@@ -105,7 +106,8 @@ Para el producto anterior: subtotal 16000, despacho 3990, total 19990 y stock re
 
 8. GET /api/pedidos/{id}: 200 con comprador; 404 con otra cuenta, incluso administrador. Una nueva compra de dos unidades cuando queda una: 409, sin pedido nuevo. Cantidad cero/fraccionaria, estado/entrega inválidos: 400.
 9. Probar estado rechazada con una clave nueva y stock suficiente: persiste resultado sin descontar.
-10. POST /api/auth/logout: 204. GET /api/auth/me con ese token: 401. Para demostrar expiración, iniciar backend con JWT_MINUTES=1, hacer login y reintentar después de un minuto.
+10. POST /api/auth/refresh con token vigente: 200 con token diferente, nuevo vencimiento y mismo perfil. El anterior devuelve 401 y el nuevo permite GET /api/auth/me (200). Conserva las restricciones por rol. Renovar sin token, con uno alterado o después de revocarlo: 401. React renueva al realizar una solicitud privada cuando quedan menos de cinco minutos; no renueva por inactividad. No existe un refresh token independiente.
+    POST /api/auth/logout: 204. GET /api/auth/me con ese token: 401. Para demostrar expiración, iniciar backend con JWT_MINUTES=1, hacer login en Swagger y reintentar después de un minuto sin renovar.
 11. DELETE del producto de prueba como vendedor/administrador: 204. Las líneas de pedidos previos conservan nombre/precio aunque se elimine el producto.
 
 Swagger muestra candados en operaciones del controlador; la tabla anterior describe cuáles son públicas. Authorize no altera permisos del usuario: el servidor decide.
@@ -118,7 +120,7 @@ Swagger muestra candados en operaciones del controlador; la tabla anterior descr
 - Captura local del pedido: test-results/checkout-mysql.png, regenerable.
 - No se ejecutaron llamadas reales a Gemini durante las pruebas; se conservó el servidor y pasaron sus casos.
 - La guía manual de Swagger está preparada; el script integral también ejecuta Try it out / Execute de GET /api/prueba en Swagger UI. La grabación del recorrido/defensa sigue pendiente.
-- EC2 y publicación no forman parte del alcance. No hubo push.
+- El código de Evaluación 3 está integrado en main; EC2 y despliegue público no forman parte del alcance.
 
 ## Migración local
 

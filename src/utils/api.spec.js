@@ -1,9 +1,33 @@
 import { describe, it, expect, vi } from 'vitest';
-import { api } from './api';
+import { api, renovarSesion } from './api';
 import { leerSesion, guardarSesion, limpiarSesion } from './sesion';
 import { sesionPrueba } from '../test/apiSimulada';
 
 describe('Sesión JWT y transporte HTTP', () => {
+  it('renueva antes de una solicitud privada y comparte la renovacion concurrente', async () => {
+    guardarSesion({ token: 'anterior', usuario: { rol: 'cliente' }, expira: new Date(Date.now() + 120000).toISOString() });
+    const nueva = { token: 'nuevo', usuario: { rol: 'cliente' }, expira: new Date(Date.now() + 3600000).toISOString() };
+    const fetch = vi.spyOn(window, 'fetch').mockImplementation(async url => ({ ok: true, status: 200, json: async () => url.endsWith('/auth/refresh') ? nueva : [] }));
+    await Promise.all([api('/pedidos'), api('/pedidos')]);
+    expect(fetch.mock.calls.filter(([url]) => url.endsWith('/auth/refresh'))).toHaveLength(1);
+    expect(fetch.mock.calls.filter(([url]) => url.endsWith('/pedidos')).every(([, options]) => options.headers.Authorization === 'Bearer nuevo')).toBe(true);
+    expect(leerSesion().token).toBe('nuevo');
+  });
+  it('no renueva sesiones cerradas y no restaura una sesion al recibir una respuesta tardia', async () => {
+    limpiarSesion();
+    const fetch = vi.spyOn(window, 'fetch');
+    await expect(renovarSesion()).rejects.toThrow('Debes iniciar sesion');
+    expect(fetch).not.toHaveBeenCalled();
+    sesionPrueba('cliente');
+    let responder;
+    fetch.mockImplementation(() => new Promise(resolve => { responder = resolve; }));
+    const pendiente = renovarSesion();
+    await vi.waitFor(() => expect(responder).toBeTypeOf('function'));
+    limpiarSesion();
+    responder({ ok: true, status: 200, json: async () => ({ token: 'nuevo', usuario: {}, expira: new Date(Date.now() + 3600000).toISOString() }) });
+    await pendiente;
+    expect(leerSesion()).toBeNull();
+  });
   it('persiste la sesión y envía Bearer solo a solicitudes privadas', async () => {
     sesionPrueba('cliente');
     const fetch = vi.spyOn(window, 'fetch').mockResolvedValue({ ok: true, json: async () => [] });

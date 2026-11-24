@@ -1,15 +1,15 @@
 # Cobertura de testing
 
-Ejecución: 24 de noviembre de 2026 a las 3:30 a. m. (America/Santiago). Herramientas: Vitest 5.0.5, proveedor de navegador Playwright y cobertura V8. Los resultados proceden de los mismos casos que se ejecutan con `npm test`.
+Ejecución: 24 de noviembre de 2026 a las 12:29 p. m. (America/Santiago). Herramientas: Vitest 5.0.5, proveedor de navegador Playwright y cobertura V8. Los resultados proceden de los mismos casos que se ejecutan con `npm test`.
 
 ## Frontend en Chromium
 
 | Métrica | Cobertura | Cubierto / total |
 |---|---|---|
-| Sentencias | 98.11% | 780 / 795 |
-| Ramas | 95.8% | 503 / 525 |
-| Funciones | 98.57% | 207 / 210 |
-| Líneas | 98.57% | 623 / 632 |
+| Sentencias | 97.8% | 803 / 821 |
+| Ramas | 95.3% | 528 / 554 |
+| Funciones | 98.6% | 212 / 215 |
+| Líneas | 98.46% | 642 / 652 |
 
 El alcance incluye los archivos JS y JSX de `src/`, también los no importados por la suite. Se excluyen las pruebas, `src/test/` y `src/main.jsx` (arranque). No se miden CSS, SVG, JSON, dependencias, servicios externos ni una auditoría visual. Los informes HTML y LCOV se regeneran en `coverage/frontend/`.
 
